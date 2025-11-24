@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TuMusica App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link id="app-style" rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+  <!-- Home Screen -->
+  <div id="home-screen" class="screen active" style="display: block;">
+    <div class="gradient-header p-6 flex flex-col justify-end">
+      <h1 class="text-3xl font-bold mb-2">TuMusica</h1>
+      <p class="text-white opacity-80">Bienvenido de nuevo</p>
+    </div>
+    
+    <div class="content-area px-4 py-6">
+      <div class="mb-8">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Para ti</h2>
+          <a href="javascript:void(0)" class="text-sm text-bright-orange">Ver todo</a>
+        </div>
+        
+        <div class="overflow-x-auto pb-4 hide-scrollbar">
+          <div class="flex space-x-4" style="min-width: max-content;">
+            <!-- Recommendation Cards -->
+            <div class="card w-48">
+              <div class="relative">
+                <img src="https://cdn.pixabay.com/photo/2018/06/30/09/29/monkey-3507317_1280.jpg" alt="Album Cover" class="w-full h-40 object-cover">
+                <div class="absolute bottom-2 right-2">
+                  <div class="play-button">
+                    <i class="fas fa-play text-white"></i>
+                  </div>
+                </div>
+                <div class="menu-trigger recommendation-menu-trigger">
+                  <i class="fas fa-ellipsis-v"></i>
+                </div>
+              </div>
+              <div class="p-3">
+                <h3 class="font-medium">Nuevo Lanzamiento</h3>
+                <p class="text-sm text-gray-400">Artista Popular</p>
+              </div>
+            </div>
+            
+            <div class="card w-48">
+              <div class="relative">
+                <img src="https://cdn.pixabay.com/photo/2018/01/15/07/51/woman-3083377_1280.jpg" alt="Album Cover" class="w-full h-40 object-cover">
+                <div class="absolute bottom-2 right-2">
+                  <div class="play-button">
+                    <i class="fas fa-play text-white"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="p-3">
+                <h3 class="font-medium">Mix del Día</h3>
+                <p class="text-sm text-gray-400">Varios Artistas</p>
+              </div>
+            </div>
+            
+            <div class="card w-48">
+              <div class="relative">
+                <img src="https://cdn.pixabay.com/photo/2019/09/17/18/48/piano-4484621_1280.jpg" alt="Album Cover" class="w-full h-40 object-cover">
+                <div class="absolute bottom-2 right-2">
+                  <div class="play-button">
+                    <i class="fas fa-play text-white"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="p-3">
+                <h3 class="font-medium">Piano Clásico</h3>
+                <p class="text-sm text-gray-400">Colección Jazz</p>
+              </div>
+            </div>
+            
+            <div class="card w-48">
+              <div class="relative">
+                <img src="https://cdn.pixabay.com/photo/2015/05/07/11/02/guitar-756326_1280.jpg" alt="Album Cover" class="w-full h-40 object-cover">
+                <div class="absolute bottom-2 right-2">
+                  <div class="play-button">
+                    <i class="fas fa-play text-white"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="p-3">
+                <h3 class="font-medium">Acústico</h3>
+                <p class="text-sm text-gray-400">Indie Pop</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Tus listas</h2>
+          <a href="javascript:void(0)" class="text-sm text-bright-orange">Editar</a>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div class="card">
+            <div class="relative">
+              <img src="https://cdn.pixabay.com/photo/2017/11/11/18/31/music-2939936_1280.jpg" alt="Playlist Cover" class="w-full h-36 object-cover">
+              <div class="menu-trigger playlist-menu-trigger">
+                <i class="fas fa-ellipsis-v"></i>
+              </div>
+            </div>
+            <div class="p-3">
+              <h3 class="font-medium">Favoritas</h3>
+              <p class="text-sm text-gray-400">32 canciones</p>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="relative">
+              <img src="https://cdn.pixabay.com/photo/2020/10/02/09/01/turntable-5621016_1280.jpg" alt="Playlist Cover" class="w-full h-36 object-cover">
+            </div>
+            <div class="p-3">
+              <h3 class="font-medium">Fiesta Mix</h3>
+              <p class="text-sm text-gray-400">48 canciones</p>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="relative">
+              <img src="https://cdn.pixabay.com/photo/2021/03/18/10/00/vinyl-6103812_1280.jpg" alt="Playlist Cover" class="w-full h-36 object-cover">
+            </div>
+            <div class="p-3">
+              <h3 class="font-medium">Clasicas</h3>
+              <p class="text-sm text-gray-400">27 canciones</p>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="relative">
+              <img src="https://cdn.pixabay.com/photo/2015/03/26/09/58/headphones-690685_1280.jpg" alt="Playlist Cover" class="w-full h-36 object-cover">
+            </div>
+            <div class="p-3">
+              <h3 class="font-medium">Concentración</h3>
+              <p class="text-sm text-gray-400">16 canciones</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activities Screen -->
+  <div id="activities-screen" class="screen">
+    <div class="p-6 bg-graphite">
+      <h1 class="text-2xl font-bold mb-4">Actividades</h1>
+      <form class="mb-6">
+        <div class="mb-4">
+          <label class="block text-sm mb-2 text-fog-gray">Canción</label>
+          <input type="text" class="form-input w-full" placeholder="¿Qué escuchaste?">
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm mb-2 text-fog-gray">Artista</label>
+          <input type="text" class="form-input w-full" placeholder="Nombre del artista">
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm mb-2 text-fog-gray">Calificación</label>
+          <div class="flex space-x-2 text-2xl">
+            <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
+            <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
+            <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
+            <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
+            <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
+          </div>
+        </div>
+        <button type="button" class="custom-btn w-full">Guardar Actividad</button>
+      </form>
+      
+      <h2 class="text-xl font-semibold mb-3">Historia de escucha</h2>
+      <div class="activities-list">
+        <div class="activity-card flex relative">
+          <div class="mr-4">
+            <img src="https://cdn.pixabay.com/photo/2016/11/22/19/15/hand-1850120_1280.jpg" alt="Activity Thumbnail" class="w-16 h-16 object-cover rounded">
+          </div>
+          <div>
+            <h3 class="font-medium">Nombre de la canción</h3>
+            <p class="text-sm text-fog-gray">Artista</p>
+            <div class="text-xs text-fog-gray mt-1">25 de Abril, 2025</div>
+          </div>
+          <div class="menu-trigger activity-menu-trigger absolute right-2 top-1/2 transform -translate-y-1/2">
+            <i class="fas fa-ellipsis-v"></i>
+          </div>
+        </div>
+        
+        <div class="activity-card flex">
+          <div class="mr-4">
+            <img src="https://cdn.pixabay.com/photo/2015/05/15/14/50/concert-768722_1280.jpg" alt="Activity Thumbnail" class="w-16 h-16 object-cover rounded">
+          </div>
+          <div>
+            <h3 class="font-medium">Otro Éxito</h3>
+            <p class="text-sm text-fog-gray">Grupo Popular</p>
+            <div class="text-xs text-fog-gray mt-1">24 de Abril, 2025</div>
+          </div>
+        </div>
+        
+        <div class="activity-card flex">
+          <div class="mr-4">
+            <img src="https://cdn.pixabay.com/photo/2018/06/17/10/38/artist-3480274_1280.jpg" alt="Activity Thumbnail" class="w-16 h-16 object-cover rounded">
+          </div>
+          <div>
+            <h3 class="font-medium">Canción del Verano</h3>
+            <p class="text-sm text-fog-gray">Cantante</p>
+            <div class="text-xs text-fog-gray mt-1">22 de Abril, 2025</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="fixed bottom-24 right-6">
+      <button class="float-btn flex items-center justify-center">
+        <i class="fas fa-plus text-white text-xl"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Profile Screen -->
+  <div id="profile-screen" class="screen">
+    <div class="p-6 flex flex-col items-center">
+        <div class="avatar-container mb-6">
+            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Profile Avatar" class="w-full h-full object-cover">
+        </div>
+        
+        <h1 class="text-2xl font-bold mb-6">Tu Perfil</h1>
+        
+        <form id="profile-form" class="w-full max-w-md"> 
+            
+            <div class="mb-4">
+                <label class="block text-sm mb-2 text-fog-gray">Nombre</label>
+                <input type="text" id="input-nombre" class="form-input w-full" placeholder="Tu nombre" value="Usuario">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm mb-2 text-fog-gray">Email</label>
+                <input type="email" id="input-email" class="form-input w-full" placeholder="tu@email.com" value="usuario@example.com" disabled>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm mb-2 text-fog-gray">Teléfono</label>
+                <input type="text" id="input-telefono" class="form-input w-full" placeholder="Tu número de teléfono">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm mb-2 text-fog-gray">Género musical favorito</label>
+                <select id="input-genero" class="form-input w-full">
+                    <option value="Rock">Rock</option>
+                    <option value="Pop">Pop</option>
+                    <option value="Jazz">Jazz</option>
+                    <option value="Electrónica">Electrónica</option>
+                    <option value="Hip Hop">Hip Hop</option>
+                    <option value="Clásica">Clásica</option>
+                </select>
+            </div>
+            
+            <p id="profile-status" class="warning-text mt-2 text-center"></p> 
+
+            <button type="submit" id="save-profile-btn" class="custom-btn w-full mt-4">Guardar cambios</button> 
+        </form>
+    </div>
+</div>
+
+  <!-- Admin/More Overlay -->
+  <div id="admin-overlay" class="admin-overlay fixed inset-0 z-40" style="display: none; transform: translateY(100%);">
+    <div class="p-6 pt-10 h-full overflow-y-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Más Opciones</h2>
+        <button id="close-admin" class="text-2xl">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="admin-item flex justify-between items-center cursor-pointer">
+        <div>
+          <h3 class="font-medium">Ajustes de cuenta</h3>
+          <p class="text-sm text-fog-gray">Privacidad, notificaciones</p>
+        </div>
+        <i class="fas fa-chevron-down text-fog-gray submenu-toggle"></i>
+        
+        <div class="submenu w-full">
+          <div class="contextual-menu-item">Privacidad</div>
+          <div class="contextual-menu-item">Notificaciones</div>
+          <div class="contextual-menu-item">Seguridad</div>
+        </div>
+      </div>
+      
+      <div class="admin-item flex justify-between items-center cursor-pointer">
+        <div>
+          <h3 class="font-medium">Opciones de reproducción</h3>
+          <p class="text-sm text-fog-gray">Calidad, descargas</p>
+        </div>
+        <i class="fas fa-chevron-down text-fog-gray submenu-toggle"></i>
+        
+        <div class="submenu w-full">
+          <div class="contextual-menu-item">Calidad alta</div>
+          <div class="contextual-menu-item">Descargas</div>
+          <div class="contextual-menu-item">Reproducción automática</div>
+        </div>
+      </div>
+      
+      <div class="admin-item flex justify-between items-center">
+        <div>
+          <h3 class="font-medium">Ayuda y soporte</h3>
+          <p class="text-sm text-fog-gray">Centro de ayuda, contacto</p>
+        </div>
+        <i class="fas fa-chevron-right text-fog-gray"></i>
+      </div>
+      
+      <div class="admin-item flex justify-between items-center">
+        <div>
+          <h3 class="font-medium">Acerca de</h3>
+          <p class="text-sm text-fog-gray">Versión, legal</p>
+        </div>
+        <i class="fas fa-chevron-right text-fog-gray"></i>
+      </div>
+      
+      <div class="admin-item flex justify-between items-center mt-6">
+        <div>
+          <h3 class="font-medium warning-text">Cerrar sesión</h3>
+        </div>
+        <i class="fas fa-sign-out-alt text-deep-red"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mini Player -->
+  <div class="mini-player fixed bottom-16 left-0 right-0 h-16 px-4 flex items-center z-20">
+    <div class="flex-1 flex items-center">
+      <img src="https://cdn.pixabay.com/photo/2018/08/21/23/16/music-3622589_1280.jpg" alt="Current Song" class="w-12 h-12 rounded object-cover mr-3">
+      <div>
+        <h4 class="font-medium text-sm">Título de Canción</h4>
+        <p class="text-xs text-fog-gray">Nombre de Artista</p>
+      </div>
+    </div>
+    <div class="flex space-x-4">
+      <button class="text-fog-gray hover:text-bright-orange">
+        <i class="fas fa-step-backward"></i>
+      </button>
+      <button class="text-white hover:text-bright-orange">
+        <i class="fas fa-play"></i>
+      </button>
+      <button class="text-fog-gray hover:text-bright-orange">
+        <i class="fas fa-step-forward"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav fixed bottom-0 left-0 right-0 h-16 flex justify-around items-center z-30">
+    <a href="javascript:void(0)" class="nav-item active flex flex-col items-center" data-screen="home">
+      <i class="fas fa-home text-xl"></i>
+      <span class="text-xs mt-1">Inicio</span>
+    </a>
+    <a href="javascript:void(0)" class="nav-item flex flex-col items-center" data-screen="activities">
+      <i class="fas fa-history text-xl"></i>
+      <span class="text-xs mt-1">Actividades</span>
+    </a>
+    <a href="javascript:void(0)" class="nav-item flex flex-col items-center" data-screen="profile">
+      <i class="fas fa-user text-xl"></i>
+      <span class="text-xs mt-1">Perfil</span>
+    </a>
+    <a href="javascript:void(0)" class="nav-item flex flex-col items-center" data-screen="admin">
+      <i class="fas fa-ellipsis-h text-xl"></i>
+      <span class="text-xs mt-1">Más</span>
+    </a>
+  </nav>
+
+  <!-- Add contextual menus containers to the body -->
+  <div id="recommendation-menu" class="contextual-menu">
+    <div class="contextual-menu-item"><i class="fas fa-heart mr-2"></i> Agregar a favorita</div>
+    <div class="contextual-menu-item"><i class="fas fa-share mr-2"></i> Compartir</div>
+    <div class="contextual-menu-item"><i class="fas fa-info-circle mr-2"></i> Ver detalles</div>
+  </div>
+
+  <div id="playlist-menu" class="contextual-menu">
+    <div class="contextual-menu-item"><i class="fas fa-edit mr-2"></i> Renombrar</div>
+    <div class="contextual-menu-item"><i class="fas fa-trash mr-2"></i> Eliminar</div>
+    <div class="contextual-menu-item"><i class="fas fa-share mr-2"></i> Compartir</div>
+  </div>
+
+  <div id="activity-menu" class="contextual-menu">
+    <div class="contextual-menu-item"><i class="fas fa-edit mr-2"></i> Editar actividad</div>
+    <div class="contextual-menu-item"><i class="fas fa-trash mr-2"></i> Eliminar actividad</div>
+    <div class="contextual-menu-item"><i class="fas fa-music mr-2"></i> Ver canción</div>
+  </div>
+
+  <div id="mobile-menu" class="contextual-menu mobile-sheet">
+    <div class="mobile-sheet-header">Opciones</div>
+    <div id="mobile-menu-content"></div>
+    <div class="mobile-sheet-close">Cancelar</div>
+  </div>
+
+  <div id="app" style="display:none;"></div>
+  <div id="menu" style="display:none;"></div>
+
+  <script type="module" src="src/main.js"></script>
+<div id="auth-screen"
+     class="fixed inset-0 bg-black/80 backdrop-blur-lg p-6 overflow-y-auto hidden">
+</div>
+
+</body>
+</html>

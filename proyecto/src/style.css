@@ -1,0 +1,362 @@
+:root {
+    --color-carbon: #0E0E0E; /* Negro muy oscuro, base principal */
+    --color-graphite: #1A1A1A; /* Negro un poco más claro, para tarjetas y mini-player */
+    --color-fog-gray: #B8B8B8; /* Gris claro, para texto secundario e iconos inactivos */
+    --color-crimson: #D7263D; /* Rojo fuerte */
+    --color-deep-red: #8B1E2D; /* Rojo oscuro */
+    --color-bright-orange: #FF7A00; /* Naranja brillante, como acento principal */
+    --color-soft-orange: #F4A259; /* Naranja suave */
+    --color-spotify-green: #1DB954; /* Verde característico de Spotify (lo incluyo por si lo quieres usar como alternativa al naranja) */
+}
+
+/* --- Estilos Globales y Base --- */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--color-carbon);
+    color: white;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    /* Relleno inferior para que el contenido no se oculte detrás del mini-player y la nav */
+    padding-bottom: 140px; /* 16px (mini-player) + 64px (nav) + un poco más de margen */
+}
+
+/* Pantallas y Contenido Principal */
+.screen {
+    display: none;
+    padding-bottom: 80px; /* Para que el contenido fluya por encima de la barra de navegación */
+}
+
+.screen.active {
+    display: block;
+}
+
+.content-area {
+    padding-bottom: 80px; 
+}
+
+/* Quita la barra de desplazamiento en contenedores de desbordamiento horizontal */
+.hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and Opera */
+}
+
+/* --- Encabezado y Gradiente --- */
+
+.gradient-header {
+    background: linear-gradient(135deg, var(--color-crimson) 0%, var(--color-bright-orange) 100%);
+    height: 160px;
+    border-radius: 0 0 25px 25px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+/* --- Tarjetas (Cards) de Contenido --- */
+
+.card {
+    background-color: var(--color-graphite);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    background-color: #242424; /* Un poco más oscuro al hacer hover */
+}
+
+.card img {
+    border-radius: 8px; /* Borde sutil a la imagen dentro de la tarjeta */
+}
+
+/* Botón de Play Flotante */
+.play-button {
+    background-color: var(--color-spotify-green); /* Uso el verde clásico de Spotify, es más distintivo */
+    width: 48px;
+    height: 48px;
+    border-radius: 50%; /* Circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    opacity: 0; /* Inicialmente invisible, como en Spotify */
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+/* Muestra el botón de play al pasar el ratón sobre la tarjeta */
+.card:hover .play-button {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.play-button:hover {
+    transform: scale(1.05);
+    background-color: #1ed760; /* Verde un poco más claro al hacer hover */
+}
+
+/* Menú de 3 puntos */
+.menu-trigger {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: white;
+    opacity: 0.7;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.menu-trigger:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* --- Navegación Inferior (Bottom Nav) --- */
+
+.bottom-nav {
+    background-color: rgba(26, 26, 26, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.nav-item {
+    color: var(--color-fog-gray);
+    text-decoration: none;
+    padding: 8px;
+    transition: color 0.3s ease;
+}
+
+.nav-item:hover {
+    color: white; /* Blanco al hacer hover en general */
+}
+
+.nav-item.active {
+    color: var(--color-bright-orange); /* Color de acento para el ítem activo */
+}
+
+/* --- Mini Player --- */
+
+.mini-player {
+    background-color: var(--color-graphite);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.mini-player button {
+    transition: color 0.2s ease;
+    padding: 4px;
+}
+
+.mini-player button:hover {
+    color: white;
+}
+
+/* El botón de play/pausa debe ser más destacado */
+.mini-player .fa-play {
+    color: var(--color-bright-orange); /* Usamos tu color de acento principal */
+    font-size: 1.5rem; 
+}
+
+.mini-player .fa-play:hover {
+    color: var(--color-soft-orange);
+}
+
+/* --- Formularios y Botones --- */
+
+.form-input {
+    background-color: var(--color-graphite);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 4px;
+    color: white;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+    border-color: var(--color-bright-orange);
+    box-shadow: 0 0 0 2px rgba(255, 122, 0, 0.4);
+}
+
+.custom-btn {
+    background-color: var(--color-bright-orange); /* Color de acento para el botón principal */
+    border-radius: 50px; /* Bordes redondeados para un look moderno */
+    padding: 12px 20px;
+    color: white;
+    font-weight: 700;
+    transition: background-color 0.25s ease, transform 0.1s ease;
+}
+
+.custom-btn:hover {
+    background-color: var(--color-soft-orange);
+    transform: translateY(-1px);
+}
+
+.float-btn {
+    background-color: var(--color-bright-orange);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s ease;
+}
+
+.float-btn:hover {
+    background-color: var(--color-soft-orange);
+    transform: rotate(90deg) scale(1.05);
+}
+
+/* --- Pantalla de Actividades (Activity Screen) --- */
+
+.activities-list .activity-card {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.activities-list .activity-card:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Estrellas de Calificación */
+.text-2xl a {
+    transition: color 0.2s ease;
+}
+/* No aplico el color por defecto para que solo se vea al pasar el ratón o al activarse con JS */
+
+.warning-text {
+    color: var(--color-crimson);
+}
+
+/* --- Perfil (Profile) --- */
+
+.avatar-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--color-bright-orange);
+    box-shadow: 0 0 0 4px rgba(255, 122, 0, 0.3);
+}
+
+/* --- Menú de Administrador (Admin/More Overlay) --- */
+
+.admin-overlay {
+    background-color: var(--color-graphite);
+    transition: transform 0.3s ease-out;
+}
+
+.admin-item {
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-item:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    margin-top: 10px;
+}
+
+.submenu-toggle.active {
+    transform: rotate(180deg);
+}
+
+.contextual-menu-item {
+    padding: 10px 15px;
+    margin-left: 20px;
+    cursor: pointer;
+    color: var(--color-fog-gray);
+    transition: color 0.2s ease, background-color 0.2s ease;
+    border-radius: 4px;
+}
+
+.contextual-menu-item:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Menús Contextuales (Flotantes) */
+.contextual-menu {
+    position: fixed;
+    z-index: 50;
+    background-color: var(--color-graphite);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+    padding: 8px 0;
+    display: none;
+    min-width: 180px;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.contextual-menu.active {
+    display: block;
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Estilo para el menú contextual que actúa como 'Mobile Sheet' */
+.mobile-sheet {
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 15px 15px 0 0;
+    padding: 0;
+}
+
+.mobile-sheet-header {
+    padding: 15px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-sheet-close {
+    padding: 15px;
+    text-align: center;
+    color: var(--color-bright-orange);
+    font-weight: bold;
+    border-top: 8px solid var(--color-carbon);
+    cursor: pointer;
+}
+
+/* Corrección de clases de Tailwind */
+.text-bright-orange {
+    color: var(--color-bright-orange);
+    transition: color 0.2s ease;
+}
+
+.text-bright-orange:hover {
+    color: var(--color-soft-orange);
+}
+
+.text-fog-gray {
+    color: var(--color-fog-gray);
+}
