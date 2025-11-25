@@ -1,86 +1,110 @@
 // src/user.js
+
 import { supabase } from "./supabase.js";
 
 const TABLE_NAME = "usuarios";
 
 export async function mostrarUser() {
-    // Obtener elementos del DOM
     const nombreInput = document.getElementById("input-nombre");
     const emailInput = document.getElementById("input-email");
     const telefonoInput = document.getElementById("input-telefono");
     const form = document.getElementById("profile-form");
     const statusMsg = document.getElementById("profile-status");
 
-    if (!form || !nombreInput || !emailInput || !telefonoInput) {
-        console.error("Error: faltan IDs del formulario.");
-        return;
-    }
-
-    form.style.pointerEvents = "none";
+    form.style.pointerEvents = 'none';
     statusMsg.textContent = "Cargando datos...";
 
-    // Obtener usuario logueado
+    // Obtener usuario autenticado
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
         statusMsg.textContent = "⚠️ Debes iniciar sesión.";
-        form.style.pointerEvents = "auto";
+        form.style.pointerEvents = 'auto';
         return;
     }
 
-    // Consultar su perfil en la tabla usuarios
-    const { data: perfilArray, error } = await supabase
+    // 1️⃣ Buscar por ID
+    let { data, error } = await supabase
         .from(TABLE_NAME)
-        .select("nombre, correo, telefono, creado_en")
+        .select("id, nombre, correo, telefono")
         .eq("id", user.id)
-        .limit(1);
+        .maybeSingle();
 
-    const perfil = perfilArray?.[0] || null;
+    // 2️⃣ Si No existe por ID, buscar por correo (para evitar duplicados)
+    if (!data) {
+        const { data: correoData } = await supabase
+            .from(TABLE_NAME)
+            .select("id, nombre, correo, telefono")
+            .eq("correo", user.email)
+            .maybeSingle();
 
-    if (error || !perfil) {
-        statusMsg.textContent = "⚠️ No se pudo cargar tu información.";
-        console.error(error);
-        form.style.pointerEvents = "auto";
-        return;
+        if (correoData) {
+            data = correoData; // usar el registro existente
+        }
     }
 
-    // Cargar datos en pantalla
-    nombreInput.value = perfil.nombre || "";
-    telefonoInput.value = perfil.telefono || "";
-    emailInput.value = perfil.correo || user.email || "";
-    emailInput.disabled = true; // correo no se debe editar
+    // 3️⃣ Si NO existe por ID NI por correo → crear registro nuevo
+    if (!data) {
+        const { error: insertError } = await supabase
+            .from(TABLE_NAME)
+            .insert({
+                id: user.id,
+                nombre: "",
+                correo: user.email,
+                telefono: ""
+            });
+
+        if (insertError) {
+            console.error("Error creando perfil:", insertError);
+            statusMsg.textContent = "❌ Error creando perfil.";
+            return;
+        }
+
+        // obtener después de insertar
+        const { data: newData } = await supabase
+            .from(TABLE_NAME)
+            .select("id, nombre, correo, telefono")
+            .eq("id", user.id)
+            .single();
+
+        data = newData;
+    }
+
+    // 4️⃣ Mostrar datos
+    nombreInput.value = data.nombre || "";
+    telefonoInput.value = data.telefono || "";
+    emailInput.value = user.email;
+    emailInput.disabled = true;
 
     statusMsg.textContent = "";
-    form.style.pointerEvents = "auto";
+    form.style.pointerEvents = 'auto';
 
-    // Listener del botón Guardar (solo una vez)
-    if (!form.dataset.listenerAdded) {
+    // Actualizar
+    if (!form.hasAttribute("data-listener-added")) {
         form.addEventListener("submit", (e) => {
             e.preventDefault();
-            actualizarPerfil(user.id, nombreInput.value, telefonoInput.value, statusMsg);
+            handleProfileUpdate(user.id, nombreInput, telefonoInput, statusMsg);
         });
-
-        form.dataset.listenerAdded = "true";
+        form.setAttribute("data-listener-added", "true");
     }
 }
 
-// -------- ACTUALIZAR DATOS -------- //
-async function actualizarPerfil(uid, nombre, telefono, statusMsg) {
-    statusMsg.textContent = "Guardando cambios...";
+// Actualizar perfil
+async function handleProfileUpdate(userId, nombreInput, telefonoInput, mensajeElement) {
+    const nombre = nombreInput.value.trim();
+    const telefono = telefonoInput.value.trim();
+
+    mensajeElement.textContent = "Guardando cambios...";
 
     const { error } = await supabase
-        .from(TABLE_NAME)
-        .update({
-            nombre,
-            telefono,
-        })
-        .eq("id", uid);
+        .from("usuarios")
+        .update({ nombre, telefono })
+        .eq("id", userId);
 
     if (error) {
-        statusMsg.textContent = "❌ Error al actualizar: " + error.message;
-        return;
+        mensajeElement.textContent = "❌ Error al actualizar: " + error.message;
+    } else {
+        mensajeElement.textContent = "✅ Datos actualizados correctamente";
+        setTimeout(() => mensajeElement.textContent = "", 3000);
     }
-
-    statusMsg.textContent = "✅ Datos actualizados correctamente";
-    setTimeout(() => (statusMsg.textContent = ""), 3000);
 }
