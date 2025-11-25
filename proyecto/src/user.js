@@ -1,103 +1,86 @@
-// src/user.js 
-
+// src/user.js
 import { supabase } from "./supabase.js";
 
-// La tabla de perfiles en Supabase se llama 'usuarios'.
-const TABLE_NAME = "usuarios"; 
+const TABLE_NAME = "usuarios";
 
 export async function mostrarUser() {
-    // 1. Obtener referencias del DOM
+    // Obtener elementos del DOM
     const nombreInput = document.getElementById("input-nombre");
     const emailInput = document.getElementById("input-email");
-    const telefonoInput = document.getElementById("input-telefono"); 
-    const generoSelect = document.getElementById("input-genero");
+    const telefonoInput = document.getElementById("input-telefono");
     const form = document.getElementById("profile-form");
     const statusMsg = document.getElementById("profile-status");
 
-    // Verificar que los elementos esenciales existen
     if (!form || !nombreInput || !emailInput || !telefonoInput) {
-        console.error("Error: Algunos IDs del formulario de perfil están faltando. Revisa tu HTML.");
+        console.error("Error: faltan IDs del formulario.");
         return;
     }
 
-    form.style.pointerEvents = 'none';
+    form.style.pointerEvents = "none";
     statusMsg.textContent = "Cargando datos...";
 
+    // Obtener usuario logueado
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        statusMsg.textContent = "⚠️ Debes iniciar sesión para ver tu perfil.";
-        form.style.pointerEvents = 'auto';
+        statusMsg.textContent = "⚠️ Debes iniciar sesión.";
+        form.style.pointerEvents = "auto";
         return;
     }
 
-    // ----------------------------------------------
-    // 🔹 Buscar solo las columnas que SÍ existen: 'nombre' y 'telefono'.
-    // ----------------------------------------------
-    const { data: profileDataArray, error } = await supabase
-    .from(TABLE_NAME)
-    .select("nombre, telefono") 
-    .eq("id", user.id)
-    .limit(1); // Limita a 1, devuelve un array
+    // Consultar su perfil en la tabla usuarios
+    const { data: perfilArray, error } = await supabase
+        .from(TABLE_NAME)
+        .select("nombre, correo, telefono, creado_en")
+        .eq("id", user.id)
+        .limit(1);
 
-const profileData = profileDataArray && profileDataArray.length > 0 ? profileDataArray[0] : null;
-    // ----------------------------------------------
-    // 🔹 Rellenar campos
-    // ----------------------------------------------
-    
-    // Rellena Nombre
-    nombreInput.value = profileData?.nombre || "";
+    const perfil = perfilArray?.[0] || null;
 
-    // Rellena Teléfono
-    telefonoInput.value = profileData?.telefono || ""; 
-    
-    // Rellena Email (desde Supabase Auth, no se edita)
-    emailInput.value = user.email || "N/A";
-    emailInput.disabled = true; 
-    
-    // NOTA: Género musical no se rellena desde Supabase porque esa columna no existe.
-    // Se mantiene en el valor por defecto del HTML.
+    if (error || !perfil) {
+        statusMsg.textContent = "⚠️ No se pudo cargar tu información.";
+        console.error(error);
+        form.style.pointerEvents = "auto";
+        return;
+    }
 
-    statusMsg.textContent = ""; 
-    form.style.pointerEvents = 'auto'; 
+    // Cargar datos en pantalla
+    nombreInput.value = perfil.nombre || "";
+    telefonoInput.value = perfil.telefono || "";
+    emailInput.value = perfil.correo || user.email || "";
+    emailInput.disabled = true; // correo no se debe editar
 
-    // ----------------------------------------------
-    // 🔹 Conectar el listener de Actualizar datos
-    // ----------------------------------------------
-    if (!form.hasAttribute('data-listener-added')) {
+    statusMsg.textContent = "";
+    form.style.pointerEvents = "auto";
+
+    // Listener del botón Guardar (solo una vez)
+    if (!form.dataset.listenerAdded) {
         form.addEventListener("submit", (e) => {
             e.preventDefault();
-            // Llamamos a la función de actualización. 
-            // Pasamos generoSelect para que la función sepa que existe, pero su valor no se usa en el UPDATE.
-            handleProfileUpdate(user, nombreInput, telefonoInput, statusMsg); 
+            actualizarPerfil(user.id, nombreInput.value, telefonoInput.value, statusMsg);
         });
-        form.setAttribute('data-listener-added', 'true');
+
+        form.dataset.listenerAdded = "true";
     }
 }
 
-// Función auxiliar para manejar la actualización
-async function handleProfileUpdate(user, nombreInput, telefonoInput, mensajeElement) {
-    const nombre = nombreInput.value.trim();
-    const telefono = telefonoInput.value.trim();
-    // const genero = generoSelect.value; // Ya no se lee para evitar errores
+// -------- ACTUALIZAR DATOS -------- //
+async function actualizarPerfil(uid, nombre, telefono, statusMsg) {
+    statusMsg.textContent = "Guardando cambios...";
 
-    mensajeElement.textContent = "Guardando cambios...";
-
-    // Solo incluimos campos que SÍ existen en tu tabla de Supabase: 'nombre' y 'telefono'.
-    const updatedFields = { 
-        nombre: nombre, 
-        telefono: telefono
-    };
-
-    const { error: updateError } = await supabase
+    const { error } = await supabase
         .from(TABLE_NAME)
-        .update(updatedFields)
-        .eq("id", user.id);
+        .update({
+            nombre,
+            telefono,
+        })
+        .eq("id", uid);
 
-    if (updateError) {
-        mensajeElement.textContent = "❌ Error al actualizar: " + updateError.message;
-    } else {
-        mensajeElement.textContent = "✅ Datos actualizados correctamente";
-        setTimeout(() => { mensajeElement.textContent = ""; }, 3000);
+    if (error) {
+        statusMsg.textContent = "❌ Error al actualizar: " + error.message;
+        return;
     }
+
+    statusMsg.textContent = "✅ Datos actualizados correctamente";
+    setTimeout(() => (statusMsg.textContent = ""), 3000);
 }

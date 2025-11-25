@@ -1,163 +1,200 @@
-import { supabase } from './supabase.js';
+// src/mvp.js
+import { supabase } from "./supabase.js";
 
-export function mostrarMVP() {
+const TABLE_NAME = "actividades_musicales";
 
-  const app = document.getElementById('app');
+export function inicializarActividades() {
+    console.log("Inicializando pantalla de Actividades...");
 
-  app.innerHTML = `
-    <section>
-      <h2>Registrar Actividad Musical</h2>
+    const form = document.querySelector("#activities-screen form");
+    const activitiesList = document.querySelector("#lista-actividades-contenedor");
+    const saveButton = document.querySelector("#activities-screen .custom-btn");
+    const selectPlaylist = document.querySelector("#select-playlist");
 
-      <form id="actividad-form">
-
-        <input type="text" name="titulo" placeholder="Título de la actividad" required />
-
-        <textarea name="descripcion" placeholder="Descripción (opcional)"></textarea>
-
-        <select name="tipo" required>
-          <option value="nueva">Nueva canción</option>
-          <option value="sesion">Sesión</option>
-          <option value="album">Nuevo álbum</option>
-          <option value="descubrimiento">Descubrimiento</option>
-          <option value="otro">Otro</option>
-        </select>
-
-        <select name="playlist_id" id="select-playlist" required>
-          <option value="">Cargando playlists...</option>
-        </select>
-
-        <input type="text" name="imagen" placeholder="URL de la imagen (opcional)" />
-
-        <button type="submit">Guardar Actividad</button>
-      </form>
-
-      <p id="mensaje" style="text-align:center; margin-top:10px;"></p>
-
-      <h3 style="margin-top:20px;">Mis Actividades Musicales</h3>
-      <div id="lista-actividades"></div>
-
-    </section>
-  `;
-
-  const form = document.getElementById('actividad-form');
-  const mensaje = document.getElementById('mensaje');
-  const lista = document.getElementById('lista-actividades');
-  const selectPlaylist = document.getElementById('select-playlist');
-
-  // -------------------------------
-  // 🔹 Cargar playlists
-  // -------------------------------
-  async function cargarPlaylists() {
-
-    const { data, error } = await supabase
-      .from('playlists')
-      .select('id, nombre')
-      .order('nombre', { ascending: true });
-
-    if (error) {
-      selectPlaylist.innerHTML = `<option>Error al cargar playlists</option>`;
-      return;
+    if (!form || !saveButton || !selectPlaylist) {
+        console.error("ERROR: faltan elementos del formulario");
+        return;
     }
 
-    selectPlaylist.innerHTML = `<option value="">Selecciona una playlist</option>`;
+    if (!saveButton.dataset.listenerAdded) {
+        saveButton.addEventListener("click", (e) => handleNewActivity(e, form, activitiesList));
+        saveButton.dataset.listenerAdded = "true";
+    }
 
-    data.forEach(playlist => {
-      const opt = document.createElement('option');
-      opt.value = playlist.id;
-      opt.textContent = playlist.nombre;
-      selectPlaylist.appendChild(opt);
+    handleRatingClicks(form);
+    cargarPlaylists(selectPlaylist);
+    cargarActividades(activitiesList);
+}
+
+/* --------------------------- ESTRELLAS --------------------------- */
+function handleRatingClicks(form) {
+    const stars = form.querySelectorAll(".fa-star");
+
+    stars.forEach((star, index) => {
+        if (!star.dataset.listenerAdded) {
+            star.addEventListener("click", () => {
+                stars.forEach((s, i) => {
+                    s.classList.toggle("text-bright-orange", i <= index);
+                    s.classList.toggle("text-fog-gray", i > index);
+                });
+            });
+            star.dataset.listenerAdded = "true";
+        }
     });
+}
 
-  }
+/* --------------------------- PLAYLISTS --------------------------- */
+async function cargarPlaylists(selectPlaylist) {
+    selectPlaylist.innerHTML = `<option value="">Cargando playlists...</option>`;
 
-  // -------------------------------
-  // 🔹 Cargar actividades del usuario
-  // -------------------------------
-  async function cargarActividades() {
+    const { data, error } = await supabase
+        .from("playlists")
+        .select("id, nombre")
+        .order("nombre");
 
-    lista.innerHTML = 'Cargando actividades...';
+    if (error) {
+        console.error(error);
+        selectPlaylist.innerHTML = `<option value="">Error al cargar playlists</option>`;
+        return;
+    }
+
+    selectPlaylist.innerHTML = `<option value="">Seleccionar playlist</option>`;
+
+    data.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.nombre;
+        selectPlaylist.appendChild(opt);
+    });
+}
+
+/* --------------------------- NUEVO REGISTRO --------------------------- */
+async function handleNewActivity(e, form, activitiesList) {
+    e.preventDefault();
+
+    const inputTitle = form.querySelector('input[placeholder="¿Qué escuchaste?"]');
+    const inputArtist = form.querySelector('input[placeholder="Nombre del artista"]');
+    const inputImagen = form.querySelector('input[placeholder="URL de la carátula (Opcional)"]');
+    const rating = form.querySelectorAll(".text-bright-orange").length;
+    const selectPlaylist = form.querySelector("#select-playlist");
 
     const { data: userData } = await supabase.auth.getUser();
     const user = userData.user;
 
-    if (!user) {
-      mensaje.textContent = '⚠️ Debes iniciar sesión para ver tus actividades.';
-      return;
-    }
+    const nuevaActividad = {
+        titulo: inputTitle.value.trim(),
+        descripcion: `Artista: ${inputArtist.value || "Desconocido"}. Calificación: ${rating}/5`,
+        tipo: "agregar_cancion",
+        imagen: inputImagen.value || "https://cdn.pixabay.com/photo/2016/11/22/19/15/hand-1850120_1280.jpg",
+        usuario_id: user.id,
+        playlist_id: selectPlaylist.value,
+    };
+
+    await supabase.from(TABLE_NAME).insert([nuevaActividad]);
+
+    form.reset();
+    cargarActividades(activitiesList);
+}
+
+/* --------------------------- CARGAR LISTA --------------------------- */
+async function cargarActividades(activitiesList) {
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData.user;
 
     const { data, error } = await supabase
-      .from('actividades_musicales')
-      .select('id, titulo, descripcion, tipo, imagen')
-      .eq('usuario_id', user.id)
-      .order('creado_en', { ascending: false });
+        .from(TABLE_NAME)
+        .select("id, titulo, descripcion, imagen, creado_en")
+        .eq("usuario_id", user.id)
+        .order("creado_en", { ascending: false });
 
     if (error) {
-      lista.innerHTML = 'Error al cargar actividades.';
-      return;
+        console.error(error);
+        activitiesList.innerHTML = `<p>Error al cargar</p>`;
+        return;
     }
 
     if (!data.length) {
-      lista.innerHTML = '<p>No has registrado actividades aún.</p>';
-      return;
+        activitiesList.innerHTML = `<p class="text-fog-gray text-center mt-4">No hay actividades aún.</p>`;
+        return;
     }
 
-    lista.innerHTML = '';
+    activitiesList.innerHTML = "";
 
     data.forEach(act => {
-      const div = document.createElement('div');
+        const artist = act.descripcion.match(/Artista: (.*?)\./)?.[1] || "Desconocido";
+        const date = new Date(act.creado_en).toLocaleDateString("es-ES");
 
-      div.innerHTML = `
-        <hr>
-        <h4>${act.titulo}</h4>
-        <p>${act.descripcion || ''}</p>
-        <p><b>Tipo:</b> ${act.tipo}</p>
-        ${act.imagen ? `<img src="${act.imagen}" width="200" />` : ''}
-      `;
+        activitiesList.innerHTML += `
+        <div class="activity-card flex justify-between items-center p-3 border-b border-deep-gray">
 
-      lista.appendChild(div);
+            <div class="flex">
+                <img src="${act.imagen}" class="w-16 h-16 rounded object-cover mr-4">
+                <div>
+                    <h3 class="font-medium">${act.titulo}</h3>
+                    <p class="text-sm text-fog-gray">${artist}</p>
+                    <span class="text-xs text-fog-gray">${date}</span>
+                </div>
+            </div>
+
+            <div class="flex space-x-3">
+                <button class="text-bright-orange edit-btn" data-id="${act.id}">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="text-red-500 delete-btn" data-id="${act.id}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+
+        </div>`;
     });
 
-  }
+    activarBotonesEdicion(activitiesList);
+}
 
-  // -------------------------------
-  // 🔹 Subir nueva actividad
-  // -------------------------------
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    mensaje.textContent = '';
+/* --------------------------- ELIMINAR --------------------------- */
+function activarBotonesEdicion(activitiesList) {
+    const deleteButtons = activitiesList.querySelectorAll(".delete-btn");
+    const editButtons = activitiesList.querySelectorAll(".edit-btn");
 
-    const { data: userData } = await supabase.auth.getUser();
-    const user = userData.user;
+    deleteButtons.forEach(btn => {
+        btn.onclick = async () => {
+            if (!confirm("¿Eliminar actividad?")) return;
 
-    if (!user) {
-      mensaje.textContent = '⚠️ Debes iniciar sesión.';
-      return;
-    }
+            const id = btn.dataset.id;
+            await supabase.from(TABLE_NAME).delete().eq("id", id);
 
-    const nuevaActividad = {
-      titulo: form.titulo.value.trim(),
-      descripcion: form.descripcion.value.trim(),
-      tipo: form.tipo.value,
-      playlist_id: form.playlist_id.value,
-      imagen: form.imagen.value.trim() || null,
-      usuario_id: user.id
-    };
+            cargarActividades(activitiesList);
+        };
+    });
 
-    const { error } = await supabase
-      .from('actividades_musicales')
-      .insert([nuevaActividad]);
+    editButtons.forEach(btn => {
+        btn.onclick = () => abrirEditor(btn.dataset.id, activitiesList);
+    });
+}
 
-    if (error) {
-      mensaje.textContent = '❌ Error: ' + error.message;
-      return;
-    }
+/* --------------------------- EDITAR --------------------------- */
+async function abrirEditor(id, activitiesList) {
+    const { data, error } = await supabase
+        .from(TABLE_NAME)
+        .select("*")
+        .eq("id", id)
+        .single();
 
-    mensaje.textContent = '✅ Actividad registrada correctamente';
-    form.reset();
-    cargarActividades();
-  });
+    if (error) return alert("Error cargando registro");
 
-  // Inicialización
-  cargarPlaylists();
-  cargarActividades();
+    const nuevoTitulo = prompt("Editar título:", data.titulo);
+    if (!nuevoTitulo) return;
+
+    const nuevaDesc = prompt("Editar descripción:", data.descripcion);
+    if (!nuevaDesc) return;
+
+    await supabase
+        .from(TABLE_NAME)
+        .update({
+            titulo: nuevoTitulo,
+            descripcion: nuevaDesc
+        })
+        .eq("id", id);
+
+    cargarActividades(activitiesList);
 }

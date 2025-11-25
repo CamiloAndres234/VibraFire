@@ -147,77 +147,53 @@
   </div>
 
   <!-- Activities Screen -->
-  <div id="activities-screen" class="screen">
+ <div id="activities-screen" class="screen">
     <div class="p-6 bg-graphite">
-      <h1 class="text-2xl font-bold mb-4">Actividades</h1>
-      <form class="mb-6">
-        <div class="mb-4">
-          <label class="block text-sm mb-2 text-fog-gray">Canción</label>
-          <input type="text" class="form-input w-full" placeholder="¿Qué escuchaste?">
+        <h1 class="text-2xl font-bold mb-4">Actividades</h1>
+        <form class="mb-6">
+            <div class="mb-4">
+                <label class="block text-sm mb-2 text-fog-gray">Canción</label>
+                <input type="text" class="form-input w-full" placeholder="¿Qué escuchaste?">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-2 text-fog-gray">Artista</label>
+                <input type="text" class="form-input w-full" placeholder="Nombre del artista">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm mb-2 text-fog-gray">URL de Imagen</label>
+                <input type="text" class="form-input w-full" placeholder="URL de la carátula (Opcional)">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm mb-2 text-fog-gray">Playlist</label>
+                <select id="select-playlist" class="form-input w-full" required>
+                    <option value="">Cargando playlists...</option>
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm mb-2 text-fog-gray">Calificación</label>
+                <div class="flex space-x-2 text-2xl">
+                    <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
+                    <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
+                    <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
+                    <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
+                    <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
+                </div>
+            </div>
+            <button type="submit" class="custom-btn w-full">Guardar Actividad</button>
+        </form>
+    </div> <h2 class="text-xl font-semibold mb-3 px-6">Historia de escucha</h2>
+    <div id="lista-actividades-contenedor" class="activities-list px-6 pb-20"> 
         </div>
-        <div class="mb-4">
-          <label class="block text-sm mb-2 text-fog-gray">Artista</label>
-          <input type="text" class="form-input w-full" placeholder="Nombre del artista">
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm mb-2 text-fog-gray">Calificación</label>
-          <div class="flex space-x-2 text-2xl">
-            <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
-            <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
-            <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
-            <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
-            <a href="javascript:void(0)" class="text-fog-gray hover:text-bright-orange"><i class="fas fa-star"></i></a>
-          </div>
-        </div>
-        <button type="button" class="custom-btn w-full">Guardar Actividad</button>
-      </form>
-      
-      <h2 class="text-xl font-semibold mb-3">Historia de escucha</h2>
-      <div class="activities-list">
-        <div class="activity-card flex relative">
-          <div class="mr-4">
-            <img src="https://cdn.pixabay.com/photo/2016/11/22/19/15/hand-1850120_1280.jpg" alt="Activity Thumbnail" class="w-16 h-16 object-cover rounded">
-          </div>
-          <div>
-            <h3 class="font-medium">Nombre de la canción</h3>
-            <p class="text-sm text-fog-gray">Artista</p>
-            <div class="text-xs text-fog-gray mt-1">25 de Abril, 2025</div>
-          </div>
-          <div class="menu-trigger activity-menu-trigger absolute right-2 top-1/2 transform -translate-y-1/2">
-            <i class="fas fa-ellipsis-v"></i>
-          </div>
-        </div>
-        
-        <div class="activity-card flex">
-          <div class="mr-4">
-            <img src="https://cdn.pixabay.com/photo/2015/05/15/14/50/concert-768722_1280.jpg" alt="Activity Thumbnail" class="w-16 h-16 object-cover rounded">
-          </div>
-          <div>
-            <h3 class="font-medium">Otro Éxito</h3>
-            <p class="text-sm text-fog-gray">Grupo Popular</p>
-            <div class="text-xs text-fog-gray mt-1">24 de Abril, 2025</div>
-          </div>
-        </div>
-        
-        <div class="activity-card flex">
-          <div class="mr-4">
-            <img src="https://cdn.pixabay.com/photo/2018/06/17/10/38/artist-3480274_1280.jpg" alt="Activity Thumbnail" class="w-16 h-16 object-cover rounded">
-          </div>
-          <div>
-            <h3 class="font-medium">Canción del Verano</h3>
-            <p class="text-sm text-fog-gray">Cantante</p>
-            <div class="text-xs text-fog-gray mt-1">22 de Abril, 2025</div>
-          </div>
-        </div>
-      </div>
-    </div>
     
     <div class="fixed bottom-24 right-6">
-      <button class="float-btn flex items-center justify-center">
-        <i class="fas fa-plus text-white text-xl"></i>
-      </button>
+        <button class="float-btn flex items-center justify-center">
+            <i class="fas fa-plus text-white text-xl"></i>
+        </button>
     </div>
-  </div>
+</div>
 
   <!-- Profile Screen -->
   <div id="profile-screen" class="screen">

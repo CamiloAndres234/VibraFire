@@ -81,4 +81,5 @@ export function mostrarRegistro() {
     loginBtn.addEventListener('click', () => {
         mostrarLogin();
     });
+
 }
