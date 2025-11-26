@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TuMusica App</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link id="app-style" rel="stylesheet" href="./src/style.css">
 </head>
 <body>
+  <!-- AUTH SCREEN (overlay usado por main.js) -->
+  <div id="auth-screen" class="fixed inset-0 bg-black/80 backdrop-blur-lg p-6 overflow-y-auto hidden"></div>
+
   <!-- Home Screen -->
-  <div id="home-screen" class="screen active" style="display: block;">
+  <div id="home-screen" class="screen active" style="display:block;">
     <div class="gradient-header p-6 flex flex-col justify-end">
       <h1 class="text-3xl font-bold mb-2">TuMusica</h1>
       <p class="text-white opacity-80">Bienvenido de nuevo</p>
     </div>
-    
+
     <div class="content-area px-4 py-6">
       <div class="mb-8">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold">Para ti</h2>
           <a href="javascript:void(0)" class="text-sm text-bright-orange">Ver todo</a>
         </div>
-        
+
         <div class="overflow-x-auto pb-4 hide-scrollbar">
           <div class="flex space-x-4" style="min-width: max-content;">
             <!-- Recommendation Cards -->
@@ -43,7 +46,7 @@
                 <p class="text-sm text-gray-400">Artista Popular</p>
               </div>
             </div>
-            
+
             <div class="card w-48">
               <div class="relative">
                 <img src="https://cdn.pixabay.com/photo/2018/01/15/07/51/woman-3083377_1280.jpg" alt="Album Cover" class="w-full h-40 object-cover">
@@ -58,7 +61,7 @@
                 <p class="text-sm text-gray-400">Varios Artistas</p>
               </div>
             </div>
-            
+
             <div class="card w-48">
               <div class="relative">
                 <img src="https://cdn.pixabay.com/photo/2016/11/21/17/39/piano-1846719_1280.jpg" alt="Album Cover" class="w-full h-40 object-cover">
@@ -73,7 +76,7 @@
                 <p class="text-sm text-gray-400">Colección Jazz</p>
               </div>
             </div>
-            
+
             <div class="card w-48">
               <div class="relative">
                 <img src="https://cdn.pixabay.com/photo/2015/05/07/11/02/guitar-756326_1280.jpg" alt="Album Cover" class="w-full h-40 object-cover">
@@ -91,13 +94,13 @@
           </div>
         </div>
       </div>
-      
+
       <div>
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold">Tus listas</h2>
           <a href="javascript:void(0)" class="text-sm text-bright-orange">Editar</a>
         </div>
-        
+
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div class="card">
             <div class="relative">
@@ -111,7 +114,7 @@
               <p class="text-sm text-gray-400">32 canciones</p>
             </div>
           </div>
-          
+
           <div class="card">
             <div class="relative">
               <img src="https://cdn.pixabay.com/photo/2020/02/21/18/22/mixer-4868324_1280.jpg" alt="Playlist Cover" class="w-full h-36 object-cover">
@@ -121,17 +124,17 @@
               <p class="text-sm text-gray-400">48 canciones</p>
             </div>
           </div>
-          
+
           <div class="card">
             <div class="relative">
               <img src="https://cdn.pixabay.com/photo/2022/06/02/18/02/violin-7238620_960_720.jpg" alt="Playlist Cover" class="w-full h-36 object-cover">
             </div>
             <div class="p-3">
-              <h3 class="font-medium">Clasicas</h3>
+              <h3 class="font-medium">Clásicas</h3>
               <p class="text-sm text-gray-400">27 canciones</p>
             </div>
           </div>
-          
+
           <div class="card">
             <div class="relative">
               <img src="https://cdn.pixabay.com/photo/2021/06/03/00/06/sheet-music-6305620_1280.jpg" alt="Playlist Cover" class="w-full h-36 object-cover">
@@ -147,176 +150,154 @@
   </div>
 
   <!-- Activities Screen -->
- <div id="activities-screen" class="screen">
-    <div class="p-6 bg-graphite">
-        <h1 class="text-2xl font-bold mb-4">Actividades</h1>
-        <form class="mb-6">
-            <div class="mb-4">
-                <label class="block text-sm mb-2 text-fog-gray">Canción</label>
-                <input type="text" class="form-input w-full" placeholder="¿Qué escuchaste?">
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm mb-2 text-fog-gray">Artista</label>
-                <input type="text" class="form-input w-full" placeholder="Nombre del artista">
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm mb-2 text-fog-gray">URL de Imagen</label>
-                <input type="text" class="form-input w-full" placeholder="URL de la carátula (Opcional)">
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm mb-2 text-fog-gray">Playlist</label>
-                <select id="select-playlist" class="form-input w-full" required>
-                    <option value="">Cargando playlists...</option>
-                </select>
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm mb-2 text-fog-gray">Calificación</label>
-                <div class="flex space-x-2 text-2xl">
-                  <i class="fas fa-star text-fog-gray cursor-pointer"></i>
-                  <i class="fas fa-star text-fog-gray cursor-pointer"></i>
-                  <i class="fas fa-star text-fog-gray cursor-pointer"></i>
-                  <i class="fas fa-star text-fog-gray cursor-pointer"></i>
-                  <i class="fas fa-star text-fog-gray cursor-pointer"></i>
-                </div>
+  <!-- ACTIVITIES SCREEN -->
+<div id="activities-screen" class="screen" style="display:none;">
 
-            </div>
-            <button type="submit" class="custom-btn w-full">Guardar Actividad</button>
-        </form>
-    </div> <h2 class="text-xl font-semibold mb-3 px-6">Historia de escucha</h2>
-    <div id="lista-actividades-contenedor" class="activities-list px-6 pb-20"> 
-        </div>
-    
-    <div class="fixed bottom-24 right-6">
-        <button class="float-btn flex items-center justify-center">
-            <i class="fas fa-plus text-white text-xl"></i>
-        </button>
-    </div>
-</div>
+  <div class="p-6">
 
-  <!-- Profile Screen -->
-  <div id="profile-screen" class="screen">
-    <div class="p-6 flex flex-col items-center">
-        <div class="avatar-container mb-6">
-            <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Profile Avatar" class="w-full h-full object-cover">
-        </div>
-        
-        <h1 class="text-2xl font-bold mb-6">Tu Perfil</h1>
-        
-        <form id="profile-form" class="w-full max-w-md"> 
-            
-            <div class="mb-4">
-                <label class="block text-sm mb-2 text-fog-gray">Nombre</label>
-                <input type="text" id="input-nombre" class="form-input w-full" placeholder="Tu nombre" value="Usuario">
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm mb-2 text-fog-gray">Email</label>
-                <input type="email" id="input-email" class="form-input w-full" placeholder="tu@email.com" value="usuario@example.com" disabled>
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm mb-2 text-fog-gray">Teléfono</label>
-                <input type="text" id="input-telefono" class="form-input w-full" placeholder="Tu número de teléfono">
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm mb-2 text-fog-gray">Género musical favorito</label>
-                <select id="input-genero" class="form-input w-full">
-                    <option value="Rock">Rock</option>
-                    <option value="Pop">Pop</option>
-                    <option value="Jazz">Jazz</option>
-                    <option value="Electrónica">Electrónica</option>
-                    <option value="Hip Hop">Hip Hop</option>
-                    <option value="Clásica">Clásica</option>
-                </select>
-            </div>
-            
-            <p id="profile-status" class="warning-text mt-2 text-center"></p> 
+    <h1 class="text-2xl font-bold mb-4">Registrar Actividad Musical</h1>
 
-            <button type="submit" id="save-profile-btn" class="custom-btn w-full mt-4">Guardar cambios</button> 
-        </form>
-    </div>
-</div>
-<!-- Now Playing Screen -->
-<div id="nowplaying-screen" class="screen">
-  <div class="background-blur"></div>
-
-  <div class="relative flex flex-col items-center p-6">
-
-    <!-- Botón menú -->
-    <div class="menu-trigger nowplaying-menu-trigger pressable absolute top-6 right-6 text-2xl text-white/80 hover:text-white transition">
-      <i class="fas fa-ellipsis-v"></i>
-    </div>
-
-    <!-- Imagen del álbum -->
-    <div class="w-full max-w-md mb-8">
-      <img 
-        src="https://cdn.pixabay.com/photo/2018/10/26/19/08/piano-3775191_1280.jpg"
-        class="w-full rounded-3xl shadow-xl"
-      />
-    </div>
-
-    <!-- Textos -->
-    <div class="text-center mb-6">
-      <h2 class="text-3xl font-bold mb-1" style="color: var(--color-crimson)">
-        Título de Canción
-      </h2>
-      <p class="text-lg text-fog-gray">Nombre de Artista</p>
-    </div>
-
-    <!-- Barra progreso -->
-    <div class="w-full max-w-md mb-6">
-      <div class="flex justify-between text-xs text-gray-300 mb-1">
-        <span>1:24</span>
-        <span>3:45</span>
+    <!-- FORMULARIO -->
+    <form id="form-actividad" class="space-y-4">
+      <input type="text" placeholder="¿Qué escuchaste?" class="form-input w-full">
+      <input type="text" placeholder="Nombre del artista" class="form-input w-full">
+      <input type="text" placeholder="URL de la carátula (Opcional)" class="form-input w-full">
+      <!-- PLAYLIST SELECT -->
+      <select id="select-playlist" class="form-input w-full">
+        <option value="">Seleccionar playlist...</option>
+      </select>
+      <!-- ESTRELLAS -->
+      <div class="flex space-x-2">
+        <i class="fas fa-star text-gray-400"></i>
+        <i class="fas fa-star text-gray-400"></i>
+        <i class="fas fa-star text-gray-400"></i>
+        <i class="fas fa-star text-gray-400"></i>
+        <i class="fas fa-star text-gray-400"></i>
       </div>
-
-      <div class="relative h-1 rounded-full bg-soft-orange">
-        <div class="progress-fill h-full rounded-full bg-bright-orange" style="width: 35%"></div>
-        <div class="progress-thumb absolute w-3 h-3 bg-white rounded-full shadow-md"
-             style="left: 35%; top: 50%; transform: translate(-50%, -50%)">
-        </div>
-      </div>
-    </div>
-
-    <!-- Controles principales -->
-    <div class="flex items-center justify-between w-full max-w-md mb-6">
-      <button class="pressable text-3xl text-gray-300 hover:text-bright-orange transition">
-        <i class="fas fa-step-backward"></i>
-      </button>
-
-      <button class="pressable text-6xl text-white hover:text-bright-orange transition">
-        <i class="fas fa-play-circle"></i>
-      </button>
-
-      <button class="pressable text-3xl text-gray-300 hover:text-bright-orange transition">
-        <i class="fas fa-step-forward"></i>
-      </button>
-    </div>
-
-    <!-- Controles extras -->
-    <div class="flex justify-between items-center w-full max-w-md mt-2">
-      <button class="pressable text-xl text-gray-300 hover:text-bright-orange transition">
-        <i class="fas fa-random"></i>
-      </button>
-
-      <button class="pressable text-xl text-gray-300 hover:text-bright-orange transition">
-        <i class="fas fa-heart"></i>
-      </button>
-
-      <button class="pressable text-xl text-gray-300 hover:text-bright-orange transition">
-        <i class="fas fa-repeat"></i>
-      </button>
-    </div>
-
+      <button type="submit" class="custom-btn w-full">Guardar Actividad</button>
+    </form>
+    <h2 class="text-xl font-bold mt-6 mb-2">Tus actividades</h2>
+    <!-- LISTA DINÁMICA -->
+    <div id="lista-actividades-contenedor" class="mt-4"></div>
   </div>
 </div>
 
+  <!-- Profile Screen -->
+  <div id="profile-screen" class="screen" style="display:none;">
+    <div class="p-6 flex flex-col items-center">
+      <div class="avatar-container mb-6">
+        <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Profile Avatar" class="w-full h-full object-cover">
+      </div>
+
+      <h1 class="text-2xl font-bold mb-6">Tu Perfil</h1>
+
+      <!-- FORM PROFILE: IDs que usa uiEvents/main -->
+      <form id="profile-form" class="w-full max-w-md">
+        <div class="mb-4">
+          <label class="block text-sm mb-2 text-fog-gray">Nombre</label>
+          <!-- id profile-name esperado por uiEvents -->
+          <input type="text" id="profile-name" class="form-input w-full" placeholder="Tu nombre" value="Usuario">
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm mb-2 text-fog-gray">Usuario (username)</label>
+          <!-- id profile-username esperado por uiEvents -->
+          <input type="text" id="profile-username" class="form-input w-full" placeholder="Usuario">
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm mb-2 text-fog-gray">Email</label>
+          <!-- profile-email (si lo necesitas) -->
+          <input type="email" id="profile-email" class="form-input w-full" placeholder="tu@email.com" value="usuario@example.com" disabled>
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm mb-2 text-fog-gray">Teléfono</label>
+          <!-- id profile-phone esperado por uiEvents -->
+          <input type="text" id="profile-phone" class="form-input w-full" placeholder="Tu número de teléfono">
+        </div>
+
+        <div class="mb-4">
+          <label class="block text-sm mb-2 text-fog-gray">Género musical favorito</label>
+          <!-- id profile-gender esperado por uiEvents -->
+          <select id="profile-gender" class="form-input w-full">
+            <option value="Rock">Rock</option>
+            <option value="Pop">Pop</option>
+            <option value="Jazz">Jazz</option>
+            <option value="Electrónica">Electrónica</option>
+            <option value="Hip Hop">Hip Hop</option>
+            <option value="Clásica">Clásica</option>
+          </select>
+        </div>
+
+        <p id="profile-status" class="warning-text mt-2 text-center"></p>
+        <button type="submit" id="save-profile-btn" class="custom-btn w-full mt-4">Guardar cambios</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Now Playing Screen -->
+  <div id="nowplaying-screen" class="screen" style="display:none;">
+    <div class="background-blur"></div>
+
+    <div class="relative flex flex-col items-center p-6">
+      <div class="menu-trigger nowplaying-menu-trigger pressable absolute top-6 right-6 text-2xl text-white/80 hover:text-white transition">
+        <i class="fas fa-ellipsis-v"></i>
+      </div>
+
+      <div class="w-full max-w-md mb-8">
+        <img src="https://cdn.pixabay.com/photo/2018/10/26/19/08/piano-3775191_1280.jpg" class="w-full rounded-3xl shadow-xl" />
+      </div>
+
+      <div class="text-center mb-6">
+        <h2 class="text-3xl font-bold mb-1" style="color: var(--color-crimson)">Título de Canción</h2>
+        <p class="text-lg text-fog-gray">Nombre de Artista</p>
+      </div>
+
+      <div class="w-full max-w-md mb-6">
+        <div class="flex justify-between text-xs text-gray-300 mb-1">
+          <span>1:24</span>
+          <span>3:45</span>
+        </div>
+
+        <div class="relative h-1 rounded-full bg-soft-orange">
+          <div class="progress-fill h-full rounded-full bg-bright-orange" style="width:35%"></div>
+          <div class="progress-thumb absolute w-3 h-3 bg-white rounded-full shadow-md" style="left:35%; top:50%; transform: translate(-50%,-50%)"></div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between w-full max-w-md mb-6">
+        <button class="pressable text-3xl text-gray-300 hover:text-bright-orange transition">
+          <i class="fas fa-step-backward"></i>
+        </button>
+
+        <button id="nowplay-play" class="pressable text-6xl text-white hover:text-bright-orange transition">
+          <i class="fas fa-play-circle"></i>
+        </button>
+
+        <button class="pressable text-3xl text-gray-300 hover:text-bright-orange transition">
+          <i class="fas fa-step-forward"></i>
+        </button>
+      </div>
+
+      <div class="flex justify-between items-center w-full max-w-md mt-2">
+        <button class="pressable text-xl text-gray-300 hover:text-bright-orange transition">
+          <i class="fas fa-random"></i>
+        </button>
+
+        <button class="pressable text-xl text-gray-300 hover:text-bright-orange transition">
+          <i class="fas fa-heart"></i>
+        </button>
+
+        <button class="pressable text-xl text-gray-300 hover:text-bright-orange transition">
+          <i class="fas fa-repeat"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Playlist Detail Screen -->
-  <div id="playlist-detail-screen" class="screen">
+  <div id="playlist-detail-screen" class="screen" style="display:none;">
     <div class="playlist-detail-header gradient-header p-6 flex items-end">
       <div class="flex items-center">
         <img id="playlist-detail-cover" src="https://cdn.pixabay.com/photo/2017/11/11/18/31/music-2939936_1280.jpg" alt="Playlist Cover" class="w-24 h-24 object-cover rounded-lg mr-4">
@@ -326,108 +307,61 @@
         </div>
       </div>
     </div>
-    
+
     <div class="action-bar bg-graphite p-4 flex space-x-4">
       <button class="custom-btn flex items-center"><i class="fas fa-play mr-2"></i> Reproducir todo</button>
       <button class="border border-bright-orange text-bright-orange rounded-lg px-4 py-2 flex items-center hover:bg-bright-orange hover:text-white transition-colors"><i class="fas fa-random mr-2"></i> Aleatorio</button>
       <button class="ml-auto text-fog-gray hover:text-white"><i class="fas fa-plus-circle text-2xl"></i></button>
       <button class="text-fog-gray hover:text-white"><i class="fas fa-ellipsis-v text-2xl"></i></button>
     </div>
-    
+
     <div class="playlist-tracks p-4 overflow-y-auto" style="max-height: calc(100vh - 220px);">
-      <!-- Track rows will be dynamically populated -->
+      <!-- Track rows -->
       <div class="track-row flex items-center p-3 hover:bg-soft-orange hover:bg-opacity-10 rounded-lg relative">
+        <!-- BOTÓN PARA VOLVER A HOME -->
+        <button class="track-back-home absolute left-2 top-2 bg-soft-orange text-white px-2 py-1 rounded text-xs shadow-md hover:bg-orange-500 transition">
+          Home
+        </button>
+
         <img src="https://cdn.pixabay.com/photo/2019/04/13/22/50/concert-4125832_1280.jpg" alt="Track" class="w-12 h-12 object-cover rounded mr-3">
+
         <div class="flex-1">
           <h3 class="font-medium">Título de Canción</h3>
           <p class="text-sm text-fog-gray">Nombre de Artista</p>
         </div>
+
         <div class="text-fog-gray mr-3">3:45</div>
+
         <div class="menu-trigger track-menu-trigger">
           <i class="fas fa-ellipsis-v"></i>
         </div>
       </div>
-      
+
       <div class="track-row flex items-center p-3 hover:bg-soft-orange hover:bg-opacity-10 rounded-lg relative">
+        <button class="track-back-home absolute left-2 top-2 bg-soft-orange text-white px-2 py-1 rounded text-xs shadow-md hover:bg-orange-500 transition">
+          Home
+        </button>
+
         <img src="https://media.istockphoto.com/id/2008322783/photo/music-band-on-stage-in-nightclub.jpg?s=2048x2048&w=is&k=20&c=R0jhpl0-XYmCzvVTKvBkBQikKnMAwuAPD70fBT6Dfoo=" alt="Track" class="w-12 h-12 object-cover rounded mr-3">
+
         <div class="flex-1">
           <h3 class="font-medium">Otro Éxito</h3>
           <p class="text-sm text-fog-gray">Grupo Popular</p>
         </div>
+
         <div class="text-fog-gray mr-3">4:12</div>
+
         <div class="menu-trigger track-menu-trigger">
           <i class="fas fa-ellipsis-v"></i>
         </div>
       </div>
-      
-      <!-- More track rows... -->
-    </div>
-  </div>
-<!-- Admin/More Overlay -->
-  <div id="admin-overlay" class="admin-overlay fixed inset-0 z-40" style="display: none; transform: translateY(100%);">
-    <div class="p-6 pt-10 h-full overflow-y-auto">
-      <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Más Opciones</h2>
-        <button id="close-admin" class="text-2xl">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      
-      <div class="admin-item flex justify-between items-center cursor-pointer">
-        <div>
-          <h3 class="font-medium">Ajustes de cuenta</h3>
-          <p class="text-sm text-fog-gray">Privacidad, notificaciones</p>
-        </div>
-        <i class="fas fa-chevron-down text-fog-gray submenu-toggle"></i>
-        
-        <div class="submenu w-full">
-          <div class="contextual-menu-item">Privacidad</div>
-          <div class="contextual-menu-item">Notificaciones</div>
-          <div class="contextual-menu-item">Seguridad</div>
-        </div>
-      </div>
-      
-      <div class="admin-item flex justify-between items-center cursor-pointer">
-        <div>
-          <h3 class="font-medium">Opciones de reproducción</h3>
-          <p class="text-sm text-fog-gray">Calidad, descargas</p>
-        </div>
-        <i class="fas fa-chevron-down text-fog-gray submenu-toggle"></i>
-        
-        <div class="submenu w-full">
-          <div class="contextual-menu-item">Calidad alta</div>
-          <div class="contextual-menu-item">Descargas</div>
-          <div class="contextual-menu-item">Reproducción automática</div>
-        </div>
-      </div>
-      
-      <div class="admin-item flex justify-between items-center">
-        <div>
-          <h3 class="font-medium">Ayuda y soporte</h3>
-          <p class="text-sm text-fog-gray">Centro de ayuda, contacto</p>
-        </div>
-        <i class="fas fa-chevron-right text-fog-gray"></i>
-      </div>
-      
-      <div class="admin-item flex justify-between items-center">
-        <div>
-          <h3 class="font-medium">Acerca de</h3>
-          <p class="text-sm text-fog-gray">Versión, legal</p>
-        </div>
-        <i class="fas fa-chevron-right text-fog-gray"></i>
-      </div>
-      
-      <div class="admin-item flex justify-between items-center mt-6">
-        <div>
-          <h3 class="font-medium warning-text">Cerrar sesión</h3>
-        </div>
-        <i class="fas fa-sign-out-alt text-deep-red"></i>
-      </div>
+
+      <!-- ... más track rows si lo necesitas ... -->
     </div>
   </div>
 
   <!-- Mini Player -->
-  <div class="mini-player fixed bottom-16 left-0 right-0 h-16 px-4 flex items-center z-20">
+  <div class="mini-player fixed bottom-16 left-0 right-0 h-16 px-4 flex items-center z-20" style="display:flex;">
     <div class="flex-1 flex items-center">
       <img src="https://cdn.pixabay.com/photo/2018/10/26/19/08/piano-3775191_1280.jpg" alt="Current Song" class="w-12 h-12 rounded object-cover mr-3">
       <div>
@@ -439,8 +373,11 @@
       <button class="text-fog-gray hover:text-bright-orange">
         <i class="fas fa-step-backward"></i>
       </button>
-      <button class="text-white hover:text-bright-orange">
+      <button id="mini-play-btn" class="text-white hover:text-bright-orange">
         <i class="fas fa-play"></i>
+      </button>
+      <button id="mini-pause-btn" class="text-fog-gray hover:text-bright-orange" style="display:none;">
+        <i class="fas fa-pause"></i>
       </button>
       <button class="text-fog-gray hover:text-bright-orange">
         <i class="fas fa-step-forward"></i>
@@ -472,42 +409,14 @@
     </a>
   </nav>
 
-  <!-- Add contextual menus containers to the body -->
-  <div id="recommendation-menu" class="contextual-menu">
-    <div class="contextual-menu-item"><i class="fas fa-heart mr-2"></i> Agregar a favorita</div>
-    <div class="contextual-menu-item"><i class="fas fa-share mr-2"></i> Compartir</div>
-    <div class="contextual-menu-item"><i class="fas fa-info-circle mr-2"></i> Ver detalles</div>
-  </div>
+  <!-- Contextual menus -->
+  <div id="recommendation-menu" class="contextual-menu hidden"></div>
+  <div id="playlist-menu" class="contextual-menu hidden"></div>
+  <div id="activity-menu" class="contextual-menu hidden"></div>
+  <div id="nowplaying-menu" class="contextual-menu hidden"></div>
+  <div id="track-menu" class="contextual-menu hidden"></div>
 
-  <div id="playlist-menu" class="contextual-menu">
-    <div class="contextual-menu-item"><i class="fas fa-edit mr-2"></i> Renombrar</div>
-    <div class="contextual-menu-item"><i class="fas fa-trash mr-2"></i> Eliminar</div>
-    <div class="contextual-menu-item"><i class="fas fa-share mr-2"></i> Compartir</div>
-  </div>
-
-  <div id="activity-menu" class="contextual-menu">
-    <div class="contextual-menu-item"><i class="fas fa-edit mr-2"></i> Editar actividad</div>
-    <div class="contextual-menu-item"><i class="fas fa-trash mr-2"></i> Eliminar actividad</div>
-    <div class="contextual-menu-item"><i class="fas fa-music mr-2"></i> Ver canción</div>
-  </div>
-
-  <div id="nowplaying-menu" class="contextual-menu">
-    <div class="contextual-menu-item"><i class="fas fa-share mr-2"></i> Compartir</div>
-    <div class="contextual-menu-item"><i class="fas fa-plus mr-2"></i> Agregar a playlist</div>
-    <div class="contextual-menu-item"><i class="fas fa-info-circle mr-2"></i> Detalles de la canción</div>
-    <div class="contextual-menu-item"><i class="fas fa-user mr-2"></i> Ver artista</div>
-    <div class="contextual-menu-item"><i class="fas fa-compact-disc mr-2"></i> Ver álbum</div>
-  </div>
-
-  <div id="track-menu" class="contextual-menu">
-    <div class="contextual-menu-item"><i class="fas fa-play mr-2"></i> Reproducir ahora</div>
-    <div class="contextual-menu-item"><i class="fas fa-list-ul mr-2"></i> Agregar a cola</div>
-    <div class="contextual-menu-item"><i class="fas fa-heart mr-2"></i> Me gusta</div>
-    <div class="contextual-menu-item"><i class="fas fa-share mr-2"></i> Compartir</div>
-    <div class="contextual-menu-item"><i class="fas fa-trash mr-2"></i> Quitar de la lista</div>
-  </div>
-
-  <div id="mobile-menu" class="contextual-menu mobile-sheet">
+  <div id="mobile-menu" class="contextual-menu mobile-sheet hidden">
     <div class="mobile-sheet-header">Opciones</div>
     <div id="mobile-menu-content"></div>
     <div class="mobile-sheet-close">Cancelar</div>
@@ -516,14 +425,7 @@
   <div id="app" style="display:none;"></div>
   <div id="menu" style="display:none;"></div>
 
-
+  <!-- MAIN JS (importa los otros módulos desde main.js) -->
   <script type="module" src="src/main.js"></script>
-
-  <div id="auth-screen"
-     class="fixed inset-0 bg-black/80 backdrop-blur-lg p-6 overflow-y-auto hidden">
-</div>
-
-
-
 </body>
 </html>
