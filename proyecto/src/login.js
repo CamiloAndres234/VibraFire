@@ -1,55 +1,64 @@
 // src/login.js
 import { supabase } from './supabase.js';
-import { mostrarRegistro } from './register.js'; 
-// Asegúrate de que 'mostrarRegistro' esté disponible si se usa en el mismo archivo.
+import { mostrarRegistro } from './register.js';
+import { mostrarAdmin } from './admin.js';
+
 
 export function mostrarLogin() {
+    const authScreen = document.getElementById('auth-screen');
+    authScreen.style.display = "block";
 
-    const app = document.getElementById('auth-screen');
-    app.style.display = "block"; // Asegura que la pantalla de autenticación esté visible
-
-    // ******* UI: Renderizado del formulario (Usando tus clases de estilo) *******
-    app.innerHTML = `
-        <section class="p-6">
-            <h2 class="text-2xl font-bold mb-4">Iniciar Sesión</h2>
-            
-            <form id="login-form" class="space-y-4">
-                <input 
-                    type="email" 
-                    name="correo" 
-                    placeholder="Correo" 
-                    required 
-                    class="form-input w-full"
-                />
-                <input 
-                    type="password" 
-                    name="password" 
-                    placeholder="Contraseña" 
-                    required 
-                    class="form-input w-full"
-                />
+    authScreen.innerHTML = `
+        <section class="p-6 flex flex-col items-center text-center">
+            <img src="https://i.pinimg.com/736x/b9/23/c7/b923c758828638ecdc73722bc2818d89.jpg"
+                 class="w-36 h-36 rounded-full shadow-xl border-4 border-[var(--color-bright-orange)] mb-4"/>
+            <h2 class="text-3xl font-bold mb-4">Bienvenido de nuevo 🎧</h2>
+            <p class="text-[var(--color-soft-orange)] mb-6">
+                Conecta con tu música, conecta contigo.
+            </p>
+            <form id="login-form" class="space-y-4 w-full max-w-sm">
+                <input type="email" name="correo" placeholder="Correo electrónico" required class="form-input w-full" />
+                <div class="relative">
+                    <input type="password" name="password" id="password-login-input" placeholder="Contraseña" required class="form-input w-full pr-12" />
+                    <button type="button" id="toggle-login-pass" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-white transition">
+                        <svg id="login-eye-closed" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12zm11 5a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/>
+                        </svg>
+                        <svg id="login-eye-open" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="hidden">
+                            <path d="M12 5C5 5 1 12 1 12s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/>
+                        </svg>
+                    </button>
+                </div>
                 <button type="submit" class="custom-btn w-full">Ingresar</button>
             </form>
-            
-            <p id="error" class="warning-text mt-2"></p> 
-            
-            <button id="ir-registro" class="text-sm text-center w-full py-2 text-gray-600 hover:text-blue-500 transition duration-150 mt-4">
+            <p id="error" class="warning-text mt-2"></p>
+            <button id="ir-registro" class="text-sm text-gray-400 hover:text-[var(--color-bright-orange)] transition duration-150 mt-4">
                 ¿No tienes cuenta? Crear cuenta
             </button>
         </section>
     `;
 
-    const form = document.getElementById('login-form');
-    const errorMsg = document.getElementById('error');
-    const irRegistro = document.getElementById('ir-registro');
+    // Toggle contraseña
+    const passInput = document.getElementById("password-login-input");
+    const togglePass = document.getElementById("toggle-login-pass");
+    const eyeClosed = document.getElementById("login-eye-closed");
+    const eyeOpen = document.getElementById("login-eye-open");
+    togglePass.addEventListener("click", () => {
+        const showing = passInput.type === "text";
+        passInput.type = showing ? "password" : "text";
+        eyeClosed.classList.toggle("hidden", !showing);
+        eyeOpen.classList.toggle("hidden", showing);
+    });
 
-    // Manejo del evento: Ir al registro
-    irRegistro.addEventListener('click', () => {
-        // Llama a la función para cambiar la vista de la app a Registro
+    // Ir a registro
+    document.getElementById('ir-registro').addEventListener('click', () => {
         mostrarRegistro();
     });
 
-    // ******* Lógica: Manejo del Evento de Login (Supabase) *******
+    // Lógica de login
+    const form = document.getElementById('login-form');
+    const errorMsg = document.getElementById('error');
+
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         errorMsg.textContent = '';
@@ -62,23 +71,31 @@ export function mostrarLogin() {
             return;
         }
 
-        // 🔐 Iniciar sesión (Lógica de Auth de Supabase)
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: correo,
-            password: password,
-        });
-
+        const { data, error } = await supabase.auth.signInWithPassword({ email: correo, password });
         if (error) {
-            // Se usa la clase 'warning-text' para el mensaje de error
             errorMsg.textContent = 'Error al iniciar sesión: ' + error.message;
             return;
         }
 
-        // ✅ Usuario autenticado correctamente
-        console.log("Usuario logueado:", data.user);
+        const { data: usuarioActual, error: rolError } = await supabase
+            .from('usuarios')
+            .select('*')
+            .eq('correo', correo)
+            .single();
 
-        // Recarga la app para que la lógica principal (ej. main.js) detecte
-        // la sesión activa y muestre el contenido del usuario.
-        location.reload(); 
+        if (rolError || !usuarioActual) {
+            errorMsg.textContent = 'No se pudo obtener el rol del usuario.';
+            return;
+        }
+
+        // Ocultar login
+        authScreen.style.display = 'none';
+
+        // Mostrar según rol
+        if (usuarioActual.rol?.toLowerCase() === 'admin') {
+            mostrarAdmin();
+        } else {
+            mostrarMenuUsuario();
+        }
     });
 }

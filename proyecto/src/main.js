@@ -6,227 +6,197 @@ import { mostrarUser } from "./user.js";
 import { mostrarAdmin } from "./admin.js";
 
 import { inicializarActividades } from "./mvp.js";
+import { initUIEvents } from "./uiEvents.js";
 
-// 💡 Mapa para controlar si el contenido de una pantalla ya fue cargado con data de Supabase
+//eSRTADO DE CARGA DE PANALLA
 const screenInitStatus = {
-    'profile': false,
-    'activities': false, // Nuevo: Estado para la pantalla de Actividades
+  profile: false,
+  activities: false,
 };
 
-// Elementos de la UI
+//rEFERENCIAS dom
 const authScreen = document.getElementById("auth-screen");
-const screens = document.querySelectorAll('.screen');
-const navItems = document.querySelectorAll('.bottom-nav .nav-item');
-const adminOverlay = document.getElementById('admin-overlay');
-const closeAdminBtn = document.getElementById('close-admin');
+const screens = document.querySelectorAll(".screen");
+const navItems = document.querySelectorAll(".bottom-nav .nav-item");
+const adminOverlay = document.getElementById("admin-overlay");
+const closeAdminBtn = document.getElementById("close-admin");
 
-// -----------------------------
-// 🔥 Mostrar y ocultar la app principal
-// -----------------------------
-function ocultarAppBonita() {
-    document.querySelectorAll(".screen").forEach(s => s.style.display = "none");
-    // Oculta navegación y reproductor
-    document.querySelector(".bottom-nav").style.display = "none";
-    document.querySelector(".mini-player").style.display = "none";
+//Mostrar Ocultar APP
+function ocultarApp() {
+  screens.forEach(s => (s.style.display = "none"));
+  const bottomNav = document.querySelector(".bottom-nav");
+  if (bottomNav) bottomNav.style.display = "none";
+  const miniPlayer = document.querySelector(".mini-player");
+  if (miniPlayer) miniPlayer.style.display = "none";
 }
 
-function mostrarAppBonita() {
-    // Solo mostramos el 'home-screen' inicialmente
-    document.getElementById("home-screen").style.display = "block";
-    // Muestra navegación y reproductor
-    document.querySelector(".bottom-nav").style.display = "flex";
-    document.querySelector(".mini-player").style.display = "flex";
+function mostrarApp() {
+  const home = document.getElementById("home-screen");
+  if (home) home.style.display = "block";
+  const bottomNav = document.querySelector(".bottom-nav");
+  if (bottomNav) bottomNav.style.display = "flex";
+  const miniPlayer = document.querySelector(".mini-player");
+  if (miniPlayer) miniPlayer.style.display = "flex";
 }
 
-// -----------------------------
-// 🔥 Pantalla de Autenticación
-// -----------------------------
-
-// Cargar contenido dentro del overlay
-function cargarPantallaAuth(html) {
-    authScreen.innerHTML = html;
-    authScreen.classList.remove("hidden");
-    // Usamos el display block/none para el overlay de auth-screen
-    authScreen.style.display = "block"; 
-    ocultarAppBonita();
+function cargarPantallaAuth(html = "") {
+  authScreen.innerHTML = html;
+  authScreen.classList.remove("hidden");
+  authScreen.style.display = "block";
+  ocultarApp();
 }
 
 function cerrarPantallaAuth() {
-    authScreen.classList.add("hidden");
-    authScreen.style.display = "none"; 
+  authScreen.classList.add("hidden");
+  authScreen.style.display = "none";
 }
 
-// -----------------------------
-// 🔐 LOGIN, REGISTRO, LOGOUT
-// -----------------------------
+//Login Registro y Loout
 export async function abrirLogin() {
-    cargarPantallaAuth("");
-    mostrarLogin(); // esta función modifica el div #auth-screen
+  cargarPantallaAuth();
+  mostrarLogin();
 }
 
 export async function abrirRegistro() {
-    cargarPantallaAuth("");
-    mostrarRegistro(); // esta función modifica el div #auth-screen
+  cargarPantallaAuth();
+  mostrarRegistro();
 }
 
-export async function CerrarSesion() {
-    if (!confirm('¿Estás seguro de que quieres cerrar la sesión?')) {
-        return; 
-    }
-    
-    hideAdminOverlay(); 
+export async function cerrarSesion() {
+  if (!confirm("¿Estás seguro de que quieres cerrar la sesión?")) return;
 
-    const { error } = await supabase.auth.signOut();
-    
-    if (error) {
-        console.error('Error al cerrar sesión:', error.message);
-        alert('Ocurrió un error al intentar cerrar sesión. Inténtalo de nuevo.');
-        return;
-    }
-    
-    // 💡 REINICIAR ESTADOS AL CERRAR SESIÓN
-    screenInitStatus.profile = false;
-    screenInitStatus.activities = false; 
+  hideAdminOverlay();
 
-    ocultarAppBonita();
-    abrirLogin();
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error("Error al cerrar sesión:", error.message);
+    alert("Ocurrió un error al intentar cerrar sesión. Inténtalo de nuevo.");
+    return;
+  }
+
+  screenInitStatus.profile = false;
+  screenInitStatus.activities = false;
+
+  ocultarApp();
+  abrirLogin();
 }
 
-// -------------------------------------------------------------------
-// 🔥 LÓGICA DE NAVEGACIÓN DE LA APP (Modificada)
-// -------------------------------------------------------------------
-
-/**
- * Muestra la pantalla de la aplicación basada en el atributo data-screen.
- * @param {string} targetScreenId - ID base de la pantalla (ej: 'home', 'activities').
- */
+//Navegascion y pantallas
 function showScreen(targetScreenId) {
-    // 1. Oculta todas las pantallas y desactiva todos los botones de navegación
-    screens.forEach(screen => {
-        screen.style.display = 'none';
-        screen.classList.remove('active');
-    });
-    navItems.forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    // 2. Manejo especial para el overlay "Más Opciones"
-    if (targetScreenId === 'admin') {
-        adminOverlay.style.display = 'block';
-        setTimeout(() => {
-            adminOverlay.style.transform = 'translateY(0)';
-        }, 10);
-        return;
-    }
-    
-    hideAdminOverlay(); 
+  screens.forEach(screen => {
+    screen.style.display = "none";
+    screen.classList.remove("active");
+  });
+  navItems.forEach(item => item.classList.remove("active"));
 
-    // 3. Muestra la pantalla normal
-    const targetScreen = document.getElementById(targetScreenId + '-screen');
-    if (targetScreen) {
-        targetScreen.style.display = 'block';
-        targetScreen.classList.add('active');
-        
-        // **🚨 LÓGICA DE CARGA DE DATOS CONDICIONAL**
-        
-        // Carga de datos de Perfil
-        if (targetScreenId === 'profile' && !screenInitStatus.profile) {
-            mostrarUser(); // Llama a la función para cargar datos de Supabase
-            screenInitStatus.profile = true;
-        }
-        
-        // 💡 Carga de datos de Actividades (Historia de escucha)
-        if (targetScreenId === 'activities' && !screenInitStatus.activities) {
-            inicializarActividades(); // Llama a la nueva función para cargar datos
-            screenInitStatus.activities = true;
-        }
+  // Admin overlay
+  if (targetScreenId === "admin") {
+    if (adminOverlay) {
+      adminOverlay.style.display = "block";
+      setTimeout(() => (adminOverlay.style.transform = "translateY(0)"), 10);
     }
+    return;
+  }
 
-    // 4. Activa el botón de navegación correspondiente
-    const activeNavItem = document.querySelector(`.bottom-nav .nav-item[data-screen="${targetScreenId}"]`);
-    if (activeNavItem) {
-        activeNavItem.classList.add('active');
+  hideAdminOverlay();
+
+  const targetScreen = document.getElementById(`${targetScreenId}-screen`);
+  if (targetScreen) {
+    targetScreen.style.display = "block";
+    targetScreen.classList.add("active");
+
+    // Carga condicional
+    if (targetScreenId === "profile" && !screenInitStatus.profile) {
+      mostrarUser();
+      screenInitStatus.profile = true;
     }
+    if (targetScreenId === "activities" && !screenInitStatus.activities) {
+      inicializarActividades();
+      screenInitStatus.activities = true;
+    }
+  }
+
+  // Activar nav
+  const activeNavItem = document.querySelector(`.bottom-nav .nav-item[data-screen="${targetScreenId}"]`);
+  if (activeNavItem) activeNavItem.classList.add("active");
 }
-/**
- * Oculta el overlay de Más Opciones.
- */
+
 function hideAdminOverlay() {
-    // Animación de deslizamiento hacia abajo
-    adminOverlay.style.transform = 'translateY(100%)';
-    setTimeout(() => {
-        adminOverlay.style.display = 'none';
-    }, 300); // Duración debe coincidir con la transición CSS
+  if (!adminOverlay) return;
+  adminOverlay.style.transform = "translateY(100%)";
+  setTimeout(() => (adminOverlay.style.display = "none"), 300);
 }
 
-// -----------------------------
-// 🧭 Cargar estado inicial
-// -----------------------------
-export async function cargarMenu() {
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-        ocultarAppBonita();
-        abrirLogin();
-        return;
-    }
-
-    // Usuario logueado → mostrar app
-    cerrarPantallaAuth();
-    mostrarAppBonita(); // Muestra el home-screen y las barras
-
-    // Activar el home por defecto y asegurarse de que se muestre
-    showScreen('home'); // Usamos la nueva función de navegación para inicializar
-
-    // Agregar los event listeners de navegación si aún no se han agregado
-    initializeNavigationListeners(); 
-}
-
-// -----------------------------
-// 🎧 Inicializar Eventos
-// -----------------------------
-
+//Inicuallixacio principal
 let listenersInitialized = false;
 
-function initializeNavigationListeners() {
-    if (listenersInitialized) return;
+function initializeUI() {
+  if (listenersInitialized) return;
 
-    // A. Navegación (Botones inferiores)
-    navItems.forEach(item => {
-        item.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetScreen = item.getAttribute('data-screen');
-            showScreen(targetScreen);
-        });
+  // Navegación inferior
+  navItems.forEach(item => {
+    item.addEventListener("click", e => {
+      e.preventDefault();
+      const screenId = item.getAttribute("data-screen");
+      if (!screenId) return;
+      showScreen(screenId);
     });
+  });
 
-    // B. Cerrar el Overlay de "Más"
-    closeAdminBtn.addEventListener('click', hideAdminOverlay);
+  // Botón cerrar overlay admin
+  if (closeAdminBtn) closeAdminBtn.addEventListener("click", hideAdminOverlay);
 
-    // C. Conectar el botón "Cerrar sesión" en el overlay de "Más"
-    const logoutBtn = adminOverlay.querySelector('.admin-item .warning-text');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', CerrarSesion);
-    }
-    
-    // D. Implementar la funcionalidad de submenús (opcional)
-    document.querySelectorAll('.submenu-toggle').forEach(toggle => {
-        toggle.addEventListener('click', function() {
-            const submenu = this.closest('.admin-item').querySelector('.submenu');
-            this.classList.toggle('active');
-            if (submenu.style.maxHeight) {
-                submenu.style.maxHeight = null;
-            } else {
-                submenu.style.maxHeight = submenu.scrollHeight + "px";
-            }
-        });
+  // Botón cerrar sesión en overlay admin
+  if (adminOverlay) {
+    const logoutBtn = adminOverlay.querySelector(".admin-item .warning-text");
+    if (logoutBtn) logoutBtn.addEventListener("click", cerrarSesion);
+  }
+
+  // Submenus
+  document.querySelectorAll(".submenu-toggle").forEach(toggle => {
+    toggle.addEventListener("click", function () {
+      const submenu = this.closest(".admin-item").querySelector(".submenu");
+      this.classList.toggle("active");
+      if (submenu.style.maxHeight) submenu.style.maxHeight = null;
+      else submenu.style.maxHeight = submenu.scrollHeight + "px";
     });
+  });
 
-    listenersInitialized = true;
+  // Inicializar uiEvents (sin duplicar nav)
+  initUIEvents({
+    handleNav: false,
+    navSelector: ".bottom-nav .nav-item",
+    screensSelector: ".screen",
+    adminOverlayId: "admin-overlay",
+    mobileMenuId: "mobile-menu",
+    mobileMenuContentId: "mobile-menu-content",
+    mobileSheetCloseSelector: ".mobile-sheet-close",
+    localStoragePrefix: "musicApp",
+    mobileBreakpoint: 640,
+  });
+
+  listenersInitialized = true;
 }
 
+//Creae estado inicuial
+export async function cargarMenu() {
+  const { data: { user } } = await supabase.auth.getUser();
 
-// -----------------------------
-// 🚀 Inicializar al cargar
-// -----------------------------
+  if (!user) {
+    ocultarApp();
+    abrirLogin();
+    return;
+  }
+
+  cerrarPantallaAuth();
+  mostrarApp();
+
+  // Mostrar home por defecto
+  showScreen("home");
+
+  // Inicializar UI
+  initializeUI();
+}
+
+//Auto iniciar
 document.addEventListener("DOMContentLoaded", cargarMenu);

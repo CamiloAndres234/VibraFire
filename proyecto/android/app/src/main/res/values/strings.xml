@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">VibraFire</string>
+    <string name="title_activity_main">VibraFire</string>
+    <string name="package_name">com.camilo.VibraFire</string>
+    <string name="custom_url_scheme">com.camilo.VibraFire</string>
+</resources>
