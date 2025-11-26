@@ -1,4 +1,7 @@
-// src/main.js
+// =======================================
+// main.js FINAL — CORREGIDO Y ESTABLE
+// =======================================
+
 import { supabase } from "./supabase.js";
 import { mostrarRegistro } from "./register.js";
 import { mostrarLogin } from "./login.js";
@@ -8,69 +11,76 @@ import { mostrarAdmin } from "./admin.js";
 import { inicializarActividades } from "./mvp.js";
 import { initUIEvents } from "./uiEvents.js";
 
-//eSRTADO DE CARGA DE PANALLA
+// ----------------------------------------
+// Estado inicial de pantallas
+// ----------------------------------------
 const screenInitStatus = {
   profile: false,
   activities: false,
 };
 
-//rEFERENCIAS dom
+// ----------------------------------------
+// Referencias DOM
+// ----------------------------------------
 const authScreen = document.getElementById("auth-screen");
 const screens = document.querySelectorAll(".screen");
 const navItems = document.querySelectorAll(".bottom-nav .nav-item");
 const adminOverlay = document.getElementById("admin-overlay");
 const closeAdminBtn = document.getElementById("close-admin");
 
-//Mostrar Ocultar APP
+// ----------------------------------------
+// Mostrar / Ocultar App
+// ----------------------------------------
 function ocultarApp() {
   screens.forEach(s => (s.style.display = "none"));
-  const bottomNav = document.querySelector(".bottom-nav");
-  if (bottomNav) bottomNav.style.display = "none";
-  const miniPlayer = document.querySelector(".mini-player");
-  if (miniPlayer) miniPlayer.style.display = "none";
+  document.querySelector(".bottom-nav")?.style.setProperty("display", "none");
+  document.querySelector(".mini-player")?.style.setProperty("display", "none");
 }
 
 function mostrarApp() {
-  const home = document.getElementById("home-screen");
-  if (home) home.style.display = "block";
-  const bottomNav = document.querySelector(".bottom-nav");
-  if (bottomNav) bottomNav.style.display = "flex";
-  const miniPlayer = document.querySelector(".mini-player");
-  if (miniPlayer) miniPlayer.style.display = "flex";
+  document.getElementById("home-screen")?.style.setProperty("display", "block");
+  document.querySelector(".bottom-nav")?.style.setProperty("display", "flex");
+  document.querySelector(".mini-player")?.style.setProperty("display", "flex");
 }
 
+// ----------------------------------------
+// Pantallas AUTH
+// ----------------------------------------
 function cargarPantallaAuth(html = "") {
   authScreen.innerHTML = html;
-  authScreen.classList.remove("hidden");
   authScreen.style.display = "block";
   ocultarApp();
 }
 
 function cerrarPantallaAuth() {
-  authScreen.classList.add("hidden");
   authScreen.style.display = "none";
+  authScreen.innerHTML = "";
 }
 
-//Login Registro y Loout
-export async function abrirLogin() {
+// ----------------------------------------
+// Abrir LOGIN / REGISTRO
+// ----------------------------------------
+export function abrirLogin() {
   cargarPantallaAuth();
   mostrarLogin();
 }
 
-export async function abrirRegistro() {
+export function abrirRegistro() {
   cargarPantallaAuth();
   mostrarRegistro();
 }
 
+// ----------------------------------------
+// Logout
+// ----------------------------------------
 export async function cerrarSesion() {
-  if (!confirm("¿Estás seguro de que quieres cerrar la sesión?")) return;
+  if (!confirm("¿Seguro que deseas cerrar la sesión?")) return;
 
   hideAdminOverlay();
 
   const { error } = await supabase.auth.signOut();
   if (error) {
-    console.error("Error al cerrar sesión:", error.message);
-    alert("Ocurrió un error al intentar cerrar sesión. Inténtalo de nuevo.");
+    alert("Error al cerrar sesión.");
     return;
   }
 
@@ -81,88 +91,94 @@ export async function cerrarSesion() {
   abrirLogin();
 }
 
-//Navegascion y pantallas
+// ----------------------------------------
+// Navegación entre pantallas
+// ----------------------------------------
 function showScreen(targetScreenId) {
-  screens.forEach(screen => {
-    screen.style.display = "none";
-    screen.classList.remove("active");
+  screens.forEach(s => {
+    s.style.display = "none";
+    s.classList.remove("active");
   });
+
   navItems.forEach(item => item.classList.remove("active"));
 
-  // Admin overlay
+  // ADMIN OVERLAY
   if (targetScreenId === "admin") {
-    if (adminOverlay) {
-      adminOverlay.style.display = "block";
-      setTimeout(() => (adminOverlay.style.transform = "translateY(0)"), 10);
-    }
+    adminOverlay.style.display = "block";
+    setTimeout(() => {
+      adminOverlay.style.transform = "translateY(0)";
+    }, 10);
     return;
   }
 
   hideAdminOverlay();
 
-  const targetScreen = document.getElementById(`${targetScreenId}-screen`);
-  if (targetScreen) {
-    targetScreen.style.display = "block";
-    targetScreen.classList.add("active");
-
-    // Carga condicional
-    if (targetScreenId === "profile" && !screenInitStatus.profile) {
-      mostrarUser();
-      screenInitStatus.profile = true;
-    }
-    if (targetScreenId === "activities" && !screenInitStatus.activities) {
-      inicializarActividades();
-      screenInitStatus.activities = true;
-    }
+  const target = document.getElementById(`${targetScreenId}-screen`);
+  if (target) {
+    target.style.display = "block";
+    target.classList.add("active");
   }
 
-  // Activar nav
-  const activeNavItem = document.querySelector(`.bottom-nav .nav-item[data-screen="${targetScreenId}"]`);
-  if (activeNavItem) activeNavItem.classList.add("active");
+  // Inicializaciones por primera vez
+  if (targetScreenId === "profile" && !screenInitStatus.profile) {
+    mostrarUser();
+    screenInitStatus.profile = true;
+  }
+
+  if (targetScreenId === "activities" && !screenInitStatus.activities) {
+    inicializarActividades();
+    screenInitStatus.activities = true;
+  }
+
+  const navActive = document.querySelector(
+    `.bottom-nav .nav-item[data-screen="${targetScreenId}"]`
+  );
+  if (navActive) navActive.classList.add("active");
 }
 
+// ----------------------------------------
+// Admin Overlay
+// ----------------------------------------
 function hideAdminOverlay() {
-  if (!adminOverlay) return;
   adminOverlay.style.transform = "translateY(100%)";
-  setTimeout(() => (adminOverlay.style.display = "none"), 300);
+  setTimeout(() => {
+    adminOverlay.style.display = "none";
+  }, 250);
 }
 
-//Inicuallixacio principal
+// ----------------------------------------
+// Inicialización UI
+// ----------------------------------------
 let listenersInitialized = false;
 
 function initializeUI() {
   if (listenersInitialized) return;
 
-  // Navegación inferior
+  // Nav inferior
   navItems.forEach(item => {
     item.addEventListener("click", e => {
       e.preventDefault();
-      const screenId = item.getAttribute("data-screen");
-      if (!screenId) return;
-      showScreen(screenId);
+      showScreen(item.dataset.screen);
     });
   });
 
-  // Botón cerrar overlay admin
-  if (closeAdminBtn) closeAdminBtn.addEventListener("click", hideAdminOverlay);
+  // Botón cerrar admin
+  closeAdminBtn?.addEventListener("click", hideAdminOverlay);
 
-  // Botón cerrar sesión en overlay admin
-  if (adminOverlay) {
-    const logoutBtn = adminOverlay.querySelector(".admin-item .warning-text");
-    if (logoutBtn) logoutBtn.addEventListener("click", cerrarSesion);
-  }
+  // Logout desde admin
+  const logoutBtn = adminOverlay.querySelector(".admin-item .warning-text");
+  logoutBtn?.addEventListener("click", cerrarSesion);
 
-  // Submenus
-  document.querySelectorAll(".submenu-toggle").forEach(toggle => {
-    toggle.addEventListener("click", function () {
+  // Submenús admin
+  document.querySelectorAll(".submenu-toggle").forEach(t => {
+    t.addEventListener("click", function () {
       const submenu = this.closest(".admin-item").querySelector(".submenu");
       this.classList.toggle("active");
-      if (submenu.style.maxHeight) submenu.style.maxHeight = null;
-      else submenu.style.maxHeight = submenu.scrollHeight + "px";
+      submenu.style.maxHeight = submenu.style.maxHeight ? null : submenu.scrollHeight + "px";
     });
   });
 
-  // Inicializar uiEvents (sin duplicar nav)
+  // UI EVENTS
   initUIEvents({
     handleNav: false,
     navSelector: ".bottom-nav .nav-item",
@@ -178,25 +194,49 @@ function initializeUI() {
   listenersInitialized = true;
 }
 
-//Creae estado inicuial
-export async function cargarMenu() {
+// ----------------------------------------
+// Manejo del estado de sesión Supabase
+// ----------------------------------------
+supabase.auth.onAuthStateChange(async (_, session) => {
+  if (!session) {
+    ocultarApp();
+    abrirLogin();
+    return;
+  }
+
+  // Usuario autenticado
+  cerrarPantallaAuth();
+
+  const { data: usuario } = await supabase
+    .from("usuarios")
+    .select("*")
+    .eq("id", session.user.id)
+    .single();
+
+  initializeUI();
+
+  if (usuario?.rol?.toLowerCase() === "admin") {
+    mostrarAdmin();
+    return;
+  }
+
+  mostrarApp();
+  showScreen("home");
+});
+
+// ----------------------------------------
+// Carga inicial al abrir la app
+// ----------------------------------------
+document.addEventListener("DOMContentLoaded", async () => {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    ocultarApp();
     abrirLogin();
     return;
   }
 
   cerrarPantallaAuth();
   mostrarApp();
-
-  // Mostrar home por defecto
-  showScreen("home");
-
-  // Inicializar UI
   initializeUI();
-}
-
-//Auto iniciar
-document.addEventListener("DOMContentLoaded", cargarMenu);
+  showScreen("home");
+});
