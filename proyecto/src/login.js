@@ -1,17 +1,24 @@
 // src/login.js
 import { supabase } from './supabase.js';
-import { mostrarRegistro } from './register.js';
-import { mostrarAdmin } from './admin.js';
+import { mostrarRegistro } from './register.js'; // Asumo que tienes este archivo
+import { navigateToAppScreen } from "./main.js"; // Necesario solo para el menú de cierre de sesión
 
+// ----------------------------------------------------------------------
+// 1. Lógica de Login (Mostrar Formulario y Manejar Submit)
+// ----------------------------------------------------------------------
 
 export function mostrarLogin() {
     const authScreen = document.getElementById('auth-screen');
-    authScreen.style.display = "block";
+    const appContainer = document.getElementById('app-container'); 
+    
+    // Asegurar visualización correcta (Login visible, App oculta)
+    if (appContainer) appContainer.classList.add('hidden');
+    authScreen.classList.remove('hidden'); 
 
     authScreen.innerHTML = `
         <section class="p-6 flex flex-col items-center text-center">
             <img src="https://i.pinimg.com/736x/b9/23/c7/b923c758828638ecdc73722bc2818d89.jpg"
-                 class="w-36 h-36 rounded-full shadow-xl border-4 border-[var(--color-bright-orange)] mb-4"/>
+                class="w-36 h-36 rounded-full shadow-xl border-4 border-[var(--color-bright-orange)] mb-4"/>
             <h2 class="text-3xl font-bold mb-4">Bienvenido de nuevo 🎧</h2>
             <p class="text-[var(--color-soft-orange)] mb-6">
                 Conecta con tu música, conecta contigo.
@@ -43,6 +50,7 @@ export function mostrarLogin() {
     const togglePass = document.getElementById("toggle-login-pass");
     const eyeClosed = document.getElementById("login-eye-closed");
     const eyeOpen = document.getElementById("login-eye-open");
+    
     togglePass.addEventListener("click", () => {
         const showing = passInput.type === "text";
         passInput.type = showing ? "password" : "text";
@@ -51,7 +59,7 @@ export function mostrarLogin() {
     });
 
     // Ir a registro
-    document.getElementById('ir-registro').addEventListener('click', () => {
+    document.getElementById('ir-registro')?.addEventListener('click', () => {
         mostrarRegistro();
     });
 
@@ -61,7 +69,7 @@ export function mostrarLogin() {
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        errorMsg.textContent = '';
+        errorMsg.textContent = 'Iniciando sesión...';
 
         const correo = form.correo.value.trim();
         const password = form.password.value.trim();
@@ -71,31 +79,60 @@ export function mostrarLogin() {
             return;
         }
 
-        const { data, error } = await supabase.auth.signInWithPassword({ email: correo, password });
+        // Solo autenticamos. main.js hará el resto (redirección)
+        const { error } = await supabase.auth.signInWithPassword({ email: correo, password });
+        
         if (error) {
-            errorMsg.textContent = 'Error al iniciar sesión: ' + error.message;
-            return;
-        }
-
-        const { data: usuarioActual, error: rolError } = await supabase
-            .from('usuarios')
-            .select('*')
-            .eq('correo', correo)
-            .single();
-
-        if (rolError || !usuarioActual) {
-            errorMsg.textContent = 'No se pudo obtener el rol del usuario.';
-            return;
-        }
-
-        // Ocultar login
-        authScreen.style.display = 'none';
-
-        // Mostrar según rol
-        if (usuarioActual.rol?.toLowerCase() === 'admin') {
-            mostrarAdmin();
+            errorMsg.textContent = 'Error: ' + error.message;
         } else {
-            mostrarMenuUsuario();
+            errorMsg.textContent = '';
         }
+    });
+}
+
+// ----------------------------------------------------------------------
+// 2. Funciones de Cierre de Sesión (para usuarios regulares)
+// ----------------------------------------------------------------------
+
+/**
+ * Muestra un menú de opciones simple (Cerrar Sesión) en el espacio de "Más".
+ * Se asume que existe un contenedor HTML con id="mobile-menu" y id="mobile-menu-content".
+ */
+export function mostrarMenuMas() {
+    const menuContent = document.getElementById('mobile-menu-content');
+    const mobileMenu = document.getElementById('mobile-menu');
+
+    if (!menuContent || !mobileMenu) return;
+    
+    // Ocultar cualquier otra pantalla de la app
+    navigateToAppScreen('home'); 
+
+    // Contenido para el usuario normal
+    menuContent.innerHTML = `
+        <div class="p-6">
+            <h3 class="text-xl font-bold mb-4 text-bright-orange">Opciones</h3>
+            <button id="logout-user-btn" 
+                    class="w-full text-center py-3 px-4 text-lg text-crimson font-semibold rounded hover:bg-graphite transition">
+                <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+            </button>
+        </div>
+    `;
+
+    // Mostrar el menú (Sheet/Modal)
+    mobileMenu.classList.remove('hidden'); 
+    mobileMenu.classList.add('show');
+    
+    document.getElementById('logout-user-btn')?.addEventListener('click', async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error('Error al cerrar sesión:', error.message);
+        }
+        // main.js se encargará de la redirección
+        mobileMenu.classList.add('hidden');
+    });
+
+    // Cerrar el menú al hacer clic en el botón de cierre (asumiendo que tiene la clase .mobile-sheet-close)
+    document.querySelector('.mobile-sheet-close')?.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
     });
 }

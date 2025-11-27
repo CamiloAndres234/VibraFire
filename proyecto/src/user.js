@@ -1,15 +1,37 @@
 // src/user.js
 
 import { supabase } from "./supabase.js";
+// Asumo que mostrarPantalla existe en main.js o que la navegación ya está hecha
+// Si mostrarUser() se llama desde el menú, la pantalla ya debería estar visible.
 
 const TABLE_NAME = "usuarios";
+const SCREEN_ID = "profile-screen"; // ID del contenedor de la pantalla de perfil
 
 export async function mostrarUser() {
+    
+    // 1. Obtener la pantalla y sus elementos
+    const profileScreen = document.getElementById(SCREEN_ID);
+    if (!profileScreen) {
+        console.error(`Contenedor #${SCREEN_ID} no encontrado.`);
+        return;
+    }
+    
+    // Asumimos que estos IDs existen dentro del HTML de #profile-screen 
+    // (inyectado previamente por tuMusicaUI.js)
     const nombreInput = document.getElementById("input-nombre");
     const emailInput = document.getElementById("input-email");
     const telefonoInput = document.getElementById("input-telefono");
     const form = document.getElementById("profile-form");
     const statusMsg = document.getElementById("profile-status");
+    
+    if (!form || !statusMsg) {
+        console.error("Elementos clave del formulario de perfil no encontrados.");
+        return;
+    }
+
+    // Mostrar el contenedor de perfil (si no lo está ya)
+    // Nota: Esto ya debería ser manejado por main.js/tuMusicaUI.js si se llama desde el menú.
+    // profileScreen.style.display = 'block'; 
 
     form.style.pointerEvents = 'none';
     statusMsg.textContent = "Cargando datos...";
@@ -22,7 +44,9 @@ export async function mostrarUser() {
         form.style.pointerEvents = 'auto';
         return;
     }
-
+    
+    // --- Lógica de Carga y Creación de Perfil ---
+    
     // 1️⃣ Buscar por ID
     let { data, error } = await supabase
         .from(TABLE_NAME)
@@ -30,7 +54,7 @@ export async function mostrarUser() {
         .eq("id", user.id)
         .maybeSingle();
 
-    // 2️⃣ Si No existe por ID, buscar por correo (para evitar duplicados)
+    // 2️⃣ Si NO existe por ID, buscar por correo 
     if (!data) {
         const { data: correoData } = await supabase
             .from(TABLE_NAME)
@@ -49,18 +73,19 @@ export async function mostrarUser() {
             .from(TABLE_NAME)
             .insert({
                 id: user.id,
-                nombre: "",
+                nombre: "", // Lo dejamos vacío para que el usuario lo llene
                 correo: user.email,
-                telefono: ""
+                telefono: "",
+                rol: "user" // Aseguramos que tenga un rol por defecto
             });
 
         if (insertError) {
             console.error("Error creando perfil:", insertError);
-            statusMsg.textContent = "❌ Error creando perfil.";
+            statusMsg.textContent = "❌ Error creando perfil. Intenta de nuevo.";
             return;
         }
 
-        // obtener después de insertar
+        // Obtener después de insertar para llenar los inputs
         const { data: newData } = await supabase
             .from(TABLE_NAME)
             .select("id, nombre, correo, telefono")
@@ -70,16 +95,17 @@ export async function mostrarUser() {
         data = newData;
     }
 
-    // 4️⃣ Mostrar datos
+    // 4️⃣ Mostrar datos en los inputs
     nombreInput.value = data.nombre || "";
     telefonoInput.value = data.telefono || "";
     emailInput.value = user.email;
-    emailInput.disabled = true;
+    emailInput.disabled = true; // El email de Auth no se puede cambiar aquí.
 
     statusMsg.textContent = "";
     form.style.pointerEvents = 'auto';
 
-    // Actualizar
+    // --- Lógica de Actualización (Listener) ---
+    // Usamos el flag data-listener-added para evitar duplicar el evento en cada llamada
     if (!form.hasAttribute("data-listener-added")) {
         form.addEventListener("submit", (e) => {
             e.preventDefault();
@@ -105,6 +131,8 @@ async function handleProfileUpdate(userId, nombreInput, telefonoInput, mensajeEl
         mensajeElement.textContent = "❌ Error al actualizar: " + error.message;
     } else {
         mensajeElement.textContent = "✅ Datos actualizados correctamente";
+        // Recargar datos para reflejar posibles cambios (aunque no es estrictamente necesario aquí)
+        // Opcional: mostrarUser(); 
         setTimeout(() => mensajeElement.textContent = "", 3000);
     }
 }
