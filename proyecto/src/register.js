@@ -109,9 +109,8 @@ export function mostrarRegistro() {
         if (!nombre || !correo || !password) {
             errorMsg.textContent = 'Por favor completa todos los campos obligatorios.';
             return;
-        }
-
-        // Crear usuario en Auth
+        }    
+// Crear usuario en Auth
         const { data: dataAuth, error: errorAuth } = await supabase.auth.signUp({
             email: correo,
             password: password,
